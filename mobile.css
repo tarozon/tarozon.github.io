@@ -1,20 +1,23 @@
+/* 
+  mobile.css
+  모바일 기기(또는 너비 768px 이하)에서만 작동합니다.
+  이 파일은 style.css를 덮어쓰지 않으며,
+  오직 모바일 전용 대응만 수행합니다.
+*/
+
+/* 모바일 기기 조건에만 스타일 적용 */
 @media only screen and (max-device-width: 768px) {
 
   html, body {
     font-size: 16px;
-    padding: 0;
+    padding: 12px;
     line-height: 1.6;
     background-color: #fffdf2;
 
-    /* 🔥 스크롤 및 터치 관련 */
-    overflow-x: scroll; /* 강제 좌우 스크롤 허용 */
-    -webkit-overflow-scrolling: touch;
-    touch-action: manipulation;
-
-    /* 🔥 줌 허용 기회 확보 (메타태그 없을 경우 대비용) */
-    zoom: 1;
-    transform: scale(1);
-    transform-origin: center center;
+    /* 🔥 중요: 스크롤과 확대 허용 관련 설정 */
+    overflow-x: auto;       /* 좌우 스크롤 허용 */
+    touch-action: manipulation; /* 모바일 브라우저에서 터치 제어 */
+    -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
   }
 
   h1, h2 {
@@ -27,7 +30,7 @@
     flex-direction: column;
     gap: 10px;
     align-items: stretch;
-    margin: 0 10px 20px 10px;
+    margin-bottom: 20px;
   }
 
   select {
@@ -50,9 +53,9 @@
   }
 
   img {
-    max-width: none;         /* ✅ 제한 해제: 가로 길게 넘치는 카드 허용 */
+    max-width: 100%;
     height: auto;
-    display: inline-block;
-    margin: 10px;
+    display: block;
+    margin: 10px auto;
   }
 }
