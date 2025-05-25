@@ -1,43 +1,50 @@
+/*
+  mobile.css
+  모바일 기기에서 카드 이미지들을 좌우로 스크롤 가능하게 구성합니다.
+  HTML은 수정하지 않으며, 이미지가 가로로 배치되어 스와이프할 수 있게 만듭니다.
+*/
+
 @media only screen and (max-device-width: 768px) {
 
-  html, body {
+  /* 1. 전체 body를 스크롤 가능하게 */
+  body {
     font-size: 16px;
-    padding: 0;
     line-height: 1.6;
+    padding: 10px;
     background-color: #fffdf2;
-
-    /* 🔥 스크롤 및 터치 관련 */
-    overflow-x: scroll; /* 강제 좌우 스크롤 허용 */
+    
+    /* 🔥 핵심: 이미지 줄바꿈 없이 가로 나열 */
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    touch-action: manipulation;
-
-    /* 🔥 줌 허용 기회 확보 (메타태그 없을 경우 대비용) */
-    zoom: 1;
-    transform: scale(1);
-    transform-origin: center center;
   }
 
+  /* 2. 이미지 설정: inline-block + margin */
+  img {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    max-width: none;
+    margin: 8px;
+    vertical-align: top;
+  }
+
+  /* 3. 기본 UI 요소는 세로 유지 */
   h1, h2 {
     font-size: 20px;
     text-align: center;
+    white-space: normal;  /* 텍스트는 줄바꿈 유지 */
   }
 
-  .selector-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: stretch;
-    margin: 0 10px 20px 10px;
-  }
-
-  select {
-    font-size: 16px;
-    padding: 8px;
-  }
-
-  button, .random-btn, #allRandomBtn, #shuffleBtn {
+  .selector-group, select, button, .random-btn, #allRandomBtn, #shuffleBtn {
+    white-space: normal;
     width: 100%;
-    font-size: 18px;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  button {
     padding: 12px;
     border-radius: 10px;
     background-color: #f3e1ff;
@@ -47,12 +54,5 @@
 
   button:hover {
     background-color: #e4d0ff;
-  }
-
-  img {
-    max-width: none;         /* ✅ 제한 해제: 가로 길게 넘치는 카드 허용 */
-    height: auto;
-    display: inline-block;
-    margin: 10px;
   }
 }
