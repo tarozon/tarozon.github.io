@@ -1,46 +1,5 @@
-/* 기본 본문 스타일 */
-body {
-  font-family: sans-serif;
-  background-color: #fffbe6;
-  padding: 20px;
-  line-height: 1.6;
-  max-width: 800px;
-  margin: 0 auto;
-}
+/* style.css (비활성화용 - 일단 아무것도 하지 않음) */
 
-/* 제목 가운데 정렬 */
-h1, h2, h3 {
-  text-align: center;
-}
+/* 향후 PC 스타일을 원할 때 여기에 추가하시면 됩니다. */
 
-/* 이미지 */
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-  margin: 10px auto;
-}
-
-/* 카드 선택 */
-.selector-group {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  justify-content: center;
-}
-
-/* 버튼 */
-button, .random-btn, #allRandomBtn, #shuffleBtn {
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  border: none;
-  border-radius: 8px;
-  background-color: #e1caff;
-  color: #333;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-button:hover {
-  background-color: #d4b6ff;
-}
+/* 현재는 모바일 대응은 mobile.css에서 처리 중입니다. */
