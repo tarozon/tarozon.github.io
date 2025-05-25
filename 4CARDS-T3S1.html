@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tarot 4-Card Spread</title>
+  <style>
+    * {
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+  </style>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #fdf6e3;
+      padding: 20px;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+    #selectors {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .selector-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    select, .random-btn, #allRandomBtn, #shuffleBtn, #captureBtn {
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    select {
+      width: 160px;
+    }
+    .spread {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 20px;
+    }
+    .card-slot {
+      width: 144px;
+      height: 252px;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: white;
+    }
+    .card-slot img {
+      height: 100%;
+      width: auto;
+      object-fit: contain;
+      transition: opacity 2s ease;
+      opacity: 0;
+    }
+    .card-slot img.visible {
+      opacity: 1;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body>
+  <h1>🃏 4-Card Spread (통합3 + 보조1) 🃏</h1>
+  <div id="selectors"></div>
+  <div class="spread">
+    <div class="card-slot"><img id="img1" /></div>
+    <div class="card-slot"><img id="img2" /></div>
+    <div class="card-slot"><img id="img3" /></div>
+    <div class="card-slot"><img id="img4" /></div>
+  </div>
+
+  <script>
+    const positions = ["통합1", "통합2", "통합3"];
+    const cardList = [
+      ["The Fool","00"],["The Magician","01"],["The High Priestess","02"],["The Empress","03"],
+      ["The Emperor","04"],["The Hierophant","05"],["The Lovers","06"],["The Chariot","07"],
+      ["Strength","08"],["The Hermit","09"],["The Wheel of Fortune","10"],["Justice","11"],
+      ["The Hanged Man","12"],["Death","13"],["Temperance","14"],["The Devil","15"],
+      ["The Tower","16"],["The Star","17"],["The Moon","18"],["The Sun","19"],
+      ["Judgement","20"],["The World","21"],["King of Pentacles","22"],["Queen of Pentacles","23"],
+      ["Knight of Pentacles","24"],["Page of Pentacles","25"],["Ace of Pentacles","26"],["Two of Pentacles","27"],
+      ["Three of Pentacles","28"],["Four of Pentacles","29"],["Five of Pentacles","30"],["Six of Pentacles","31"],
+      ["Seven of Pentacles","32"],["Eight of Pentacles","33"],["Nine of Pentacles","34"],["Ten of Pentacles","35"],
+      ["King of Cups","36"],["Queen of Cups","37"],["Knight of Cups","38"],["Page of Cups","39"],
+      ["Ace of Cups","40"],["Two of Cups","41"],["Three of Cups","42"],["Four of Cups","43"],
+      ["Five of Cups","44"],["Six of Cups","45"],["Seven of Cups","46"],["Eight of Cups","47"],
+      ["Nine of Cups","48"],["Ten of Cups","49"],["King of Swords","50"],["Queen of Swords","51"],
+      ["Knight of Swords","52"],["Page of Swords","53"],["Ace of Swords","54"],["Two of Swords","55"],
+      ["Three of Swords","56"],["Four of Swords","57"],["Five of Swords","58"],["Six of Swords","59"],
+      ["Seven of Swords","60"],["Eight of Swords","61"],["Nine of Swords","62"],["Ten of Swords","63"],
+      ["King of Wands","64"],["Queen of Wands","65"],["Knight of Wands","66"],["Page of Wands","67"],
+      ["Ace of Wands","68"],["Two of Wands","69"],["Three of Wands","70"],["Four of Wands","71"],
+      ["Five of Wands","72"],["Six of Wands","73"],["Seven of Wands","74"],["Eight of Wands","75"],
+      ["Nine of Wands","76"],["Ten of Wands","77"]
+    ];
+
+    window.onload = () => {
+      const selectorContainer = document.getElementById('selectors');
+      const selects = [];
+
+      for (let i = 0; i < 3; i++) {
+        const group = document.createElement('div');
+        group.className = 'selector-group';
+
+        const select = document.createElement('select');
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.text = `${i + 1}. ${positions[i]}`;
+        select.appendChild(defaultOpt);
+        cardList.forEach(([name, code], idx) => {
+          const opt = document.createElement('option');
+          opt.value = code;
+          opt.text = idx < 22 ? `${code} ${name}` : name;
+          select.appendChild(opt);
+        });
+
+        select.addEventListener('change', function () {
+          const code = this.value;
+          const img = document.getElementById(`img${i + 1}`);
+          if (code) {
+            const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)';
+            img.src = `cards/${code}.jpg`;
+            img.style.transform = rot;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            img.classList.remove('visible');
+            setTimeout(() => img.classList.add('visible'), 10);
+          } else {
+            img.src = '';
+            img.classList.remove('visible');
+          }
+        });
+
+        selects.push(select);
+
+        const rndBtn = document.createElement('button');
+        rndBtn.type = 'button';
+        rndBtn.textContent = 'DRAW';
+        rndBtn.className = 'random-btn';
+        rndBtn.addEventListener('click', () => {
+          const used = selects.map((s,j)=> j===i?null:s.value).filter(v=>v);
+          const avail = cardList.map(c=>c[1]).filter(c=>!used.includes(c));
+          if (!avail.length) return;
+          const code = avail[Math.floor(Math.random()*avail.length)];
+          select.value = code;
+          select.dispatchEvent(new Event('change'));
+        });
+
+        const flipBtn = document.createElement('button');
+        flipBtn.type = 'button';
+        flipBtn.textContent = 'FLIP';
+        flipBtn.className = 'random-btn';
+        flipBtn.addEventListener('click', () => {
+          const img = document.getElementById(`img${i + 1}`);
+          const current = img.style.transform || 'rotate(0deg)';
+          const rotated = current.includes('180deg') ? 'rotate(0deg)' : 'rotate(180deg)';
+          img.style.transform = rotated;
+        });
+
+        group.appendChild(select);
+        group.appendChild(rndBtn);
+        group.appendChild(flipBtn);
+        selectorContainer.appendChild(group);
+      }
+
+      // 보조카드 추가
+      const subGroup = document.createElement('div');
+      subGroup.className = 'selector-group';
+      const subSelect = document.createElement('select');
+      const subDefault = document.createElement('option');
+      subDefault.value = '';
+      subDefault.text = `4. 보조카드`;
+      subSelect.appendChild(subDefault);
+      cardList.forEach(([name, code], idx) => {
+        const opt = document.createElement('option');
+        opt.value = code;
+        opt.text = idx < 22 ? `${code} ${name}` : name;
+        subSelect.appendChild(opt);
+      });
+      subSelect.addEventListener('change', function () {
+        const code = this.value;
+        const img = document.getElementById(`img4`);
+        if (code) {
+          const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)';
+          img.src = `cards/${code}.jpg`;
+          img.style.transform = rot;
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.objectFit = 'cover';
+          img.classList.remove('visible');
+          setTimeout(() => img.classList.add('visible'), 10);
+        } else {
+          img.src = '';
+          img.classList.remove('visible');
+        }
+      });
+      const subDrawBtn = document.createElement('button');
+      subDrawBtn.type = 'button';
+      subDrawBtn.textContent = 'DRAW';
+      subDrawBtn.className = 'random-btn';
+      subDrawBtn.addEventListener('click', () => {
+        const used = [...selects.map(s => s.value), subSelect.value].filter(Boolean);
+        const avail = cardList.map(c => c[1]).filter(c => !used.includes(c));
+        if (!avail.length) return;
+        const code = avail[Math.floor(Math.random() * avail.length)];
+        subSelect.value = code;
+        subSelect.dispatchEvent(new Event('change'));
+      });
+      const subFlipBtn = document.createElement('button');
+      subFlipBtn.type = 'button';
+      subFlipBtn.textContent = 'FLIP';
+      subFlipBtn.className = 'random-btn';
+      subFlipBtn.addEventListener('click', () => {
+        const img = document.getElementById(`img4`);
+        const current = img.style.transform || 'rotate(0deg)';
+        img.style.transform = current.includes('180deg') ? 'rotate(0deg)' : 'rotate(180deg)';
+      });
+      subGroup.appendChild(subSelect);
+      subGroup.appendChild(subDrawBtn);
+      subGroup.appendChild(subFlipBtn);
+      selectorContainer.appendChild(subGroup);
+
+      // 추가 버튼: DRAW ALL, New Spread, CAPTURE
+      const allGroup = document.createElement('div');
+      allGroup.className = 'selector-group';
+      const allBtn = document.createElement('button');
+      allBtn.id = 'allRandomBtn';
+      allBtn.textContent = 'DRAW ALL';
+      allBtn.className = 'random-btn';
+      allBtn.addEventListener('click', () => {
+        const codes = cardList.map(c => c[1]);
+        const shuffled = codes.sort(() => Math.random() - 0.5);
+        [...selects, subSelect].forEach((sel, j) => {
+          sel.value = shuffled[j];
+          sel.dispatchEvent(new Event('change'));
+        });
+      });
+      allGroup.appendChild(allBtn);
+      selectorContainer.appendChild(allGroup);
+
+      const shGroup = document.createElement('div');
+      shGroup.className = 'selector-group';
+      const shBtn = document.createElement('button');
+      shBtn.id = 'shuffleBtn';
+      shBtn.textContent = 'New Spread';
+      shBtn.className = 'random-btn';
+      shBtn.addEventListener('click', () => location.reload());
+      shGroup.appendChild(shBtn);
+      selectorContainer.appendChild(shGroup);
+
+      const capGroup = document.createElement('div');
+      capGroup.className = 'selector-group';
+      const capBtn = document.createElement('button');
+      capBtn.id = 'captureBtn';
+      capBtn.textContent = 'CAPTURE';
+      capBtn.className = 'random-btn';
+      capBtn.addEventListener('click', async () => {
+        const element = document.querySelector('.spread');
+        try {
+          const canvas = await html2canvas(element);
+          canvas.toBlob(async (blob) => {
+            let done = false;
+            if (window.showSaveFilePicker) {
+              try {
+                const opts = {
+                  types: [{
+                    description: 'JPEG image',
+                    accept: { 'image/jpeg': ['.jpg', '.jpeg'] }
+                  }]
+                };
+                const fileHandle = await window.showSaveFilePicker({
+                  ...opts,
+                  suggestedName: 'spread.jpg'
+                });
+                const writable = await fileHandle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+                done = true;
+              } catch (e) {
+                console.warn('showSaveFilePicker 실패, 대체 다운로드 사용', e);
+              }
+            }
+            if (!done) {
+              const url = URL.createObjectURL(blob);
+              const filename = prompt('저장할 파일명(.jpg) 입력:', 'spread.jpg') || 'spread.jpg';
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = filename;
+              document.body.appendChild(link);
+              link.click();
+              link.remove();
+              URL.revokeObjectURL(url);
+            }
+            alert('스프레드가 저장되었어요! 😊');
+          }, 'image/jpeg');
+        } catch (err) {
+          console.error(err);
+          alert('캡처에 실패했어요… 콘솔을 확인해 주세요.');
+        }
+      });
+      capGroup.appendChild(capBtn);
+      selectorContainer.appendChild(capGroup);
+    };
+  </script>
+  <!-- 오른쪽 클릭 방지 -->
+  <script>
+    document.addEventListener('contextmenu', event => event.preventDefault());
+  </script>
+
+  <!-- 단축키 방지 -->
+  <script>
+    document.addEventListener('keydown', function (e) {
+      if (
+        e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'c') ||
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && e.key === 'I')
+      ) {
+        e.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>
+
+  <div id="reading-section" style="margin-top: 40px; max-width: 800px; width: 90%; text-align: center;">
+    <h2>🔮 GPT 리딩 요청 자동 템플릿</h2>
+    <p>다음 칸에 질문을 입력한 뒤, 리딩 요청문을 생성하고 복사해서 ChatGPT에 붙여넣어보세요!</p>
+    <textarea id="userQuestion" placeholder="예: 상대방은 내가 어떻게 생각할까? 우리 관계는 어떻게 될까?" style="width: 100%; height: 140px; padding: 10px; font-size: 14px; margin-bottom: 10px;"></textarea>
+    <br />
+    <button id="generateBtn" onclick="generatePrompt()">리딩 요청문 만들기</button>
+    <button id="copyBtn" onclick="copyPrompt()">📋 복사하기</button>
+    <button id="gptJumpBtn" onclick="goToChatGPT()">🤖 ChatGPT로 이동</button>
+    <pre id="outputArea" style="background:#fff3; padding:1em; white-space:pre-wrap; min-height:120px; font-family:monospace; text-align:left; margin-top: 10px;"></pre>
+  </div>
+
+  <script>
+    function getCardName(imgId) {
+      const img = document.getElementById(imgId);
+      if (!img || !img.src) return "(선택되지 않음)";
+      const code = img.src.split("/").pop().replace(".jpg", "");
+      const found = cardList.find(([_, c]) => c === code);
+      return found ? found[0] : code;
+    }
+
+    function generatePrompt() {
+      const question = document.getElementById("userQuestion").value.trim() || "(질문 내용 없음)";
+      const cardNames = [
+        getCardName("img1"),
+        getCardName("img2"),
+        getCardName("img3"),
+        getCardName("img4")
+      ];
+
+      const promptText = `내 상황은 다음과 같아:\n${question}\n\n사용한 카드는 라이더 웨이트 덱이고, 뽑은 카드는 아래와 같아.\n- 통합 카드 1: ${cardNames[0]}\n- 통합 카드 2: ${cardNames[1]}\n- 통합 카드 3: ${cardNames[2]}\n- 보조 카드: ${cardNames[3]}\n\n이 카드들을 바탕으로 어떤 통합적 메시지를 줄 수 있을까? 자세히 해석해줘.`;
+
+      document.getElementById("outputArea").textContent = promptText;
+    }
+
+    function copyPrompt() {
+      const text = document.getElementById("outputArea").textContent;
+      navigator.clipboard.writeText(text).then(() => alert("복사되었어요! GPT에 붙여넣기 하세요 ✨"));
+    }
+
+    function goToChatGPT() {
+      const text = document.getElementById("outputArea").textContent;
+      if (!text.trim()) {
+        alert("먼저 리딩 요청문을 생성해 주세요!");
+        return;
+      }
+      navigator.clipboard.writeText(text).then(() => {
+        window.open("https://chat.openai.com", "_blank");
+      });
+    }
+  </script>
+</body>
+</html>
