@@ -7,13 +7,17 @@
 
 /* 모바일 기기 조건에만 스타일 적용 */
 @media only screen and (max-device-width: 768px) {
-  
-  body {
+
+  html, body {
     font-size: 16px;
     padding: 12px;
     line-height: 1.6;
-    overflow-x: hidden;
     background-color: #fffdf2;
+
+    /* 🔥 중요: 스크롤과 확대 허용 관련 설정 */
+    overflow-x: auto;       /* 좌우 스크롤 허용 */
+    touch-action: manipulation; /* 모바일 브라우저에서 터치 제어 */
+    -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
   }
 
   h1, h2 {
