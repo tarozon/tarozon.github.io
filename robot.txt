@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://tarozon.com/sitemap.xml
