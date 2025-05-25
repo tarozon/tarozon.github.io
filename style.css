@@ -1,0 +1,33 @@
+/* 기본 레이아웃 */
+body {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: sans-serif;
+  background-color: #fffbe6;
+}
+
+/* 카드 이미지 */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 10px auto;
+}
+
+/* 타이틀 */
+h1, h2 {
+  text-align: center;
+}
+
+/* 모바일 대응 미디어쿼리 */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+    font-size: 16px;
+  }
+
+  img {
+    margin: 5px auto;
+  }
+}
