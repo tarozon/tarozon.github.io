@@ -1,15 +1,57 @@
-body {
-  font-size: 16px;
-  padding: 10px;
-  overflow-x: hidden;
-}
+/* 
+  mobile.css
+  모바일 기기(또는 너비 768px 이하)에서만 작동합니다.
+  이 파일은 style.css를 덮어쓰지 않으며,
+  오직 모바일 전용 대응만 수행합니다.
+*/
 
-.selector-group {
-  flex-direction: column;
-  align-items: center;
-}
+/* 모바일 기기 조건에만 스타일 적용 */
+@media only screen and (max-device-width: 768px) {
+  
+  body {
+    font-size: 16px;
+    padding: 12px;
+    line-height: 1.6;
+    overflow-x: hidden;
+    background-color: #fffdf2;
+  }
 
-button {
-  width: 100%;
-  font-size: 18px;
+  h1, h2 {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .selector-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    margin-bottom: 20px;
+  }
+
+  select {
+    font-size: 16px;
+    padding: 8px;
+  }
+
+  button, .random-btn, #allRandomBtn, #shuffleBtn {
+    width: 100%;
+    font-size: 18px;
+    padding: 12px;
+    border-radius: 10px;
+    background-color: #f3e1ff;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  button:hover {
+    background-color: #e4d0ff;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 10px auto;
+  }
 }
