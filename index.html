@@ -50,6 +50,14 @@
       color: #888;
     }
   </style>
+
+  <style>
+    * {
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+  </style>
 </head>
 <body>
 
@@ -77,6 +85,24 @@
   <footer>
     © 2025 타로존 TaroZon.com
   </footer>
+
+  <!-- 오른쪽 클릭 방지 -->
+  <script>
+    document.addEventListener('contextmenu', event => event.preventDefault());
+  </script>
+
+  <!-- 단축키 방지 -->
+  <script>
+    document.addEventListener('keydown', function (e) {
+      if (
+        e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'c') ||
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && e.key === 'I')
+      ) {
+        e.preventDefault();
+      }
+    });
+  </script>
 
 </body>
 </html>
