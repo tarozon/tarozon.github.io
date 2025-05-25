@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>실물 타로 리딩 요청</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #fdf6e3;
+      color: #333;
+      padding: 30px;
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+    p.intro {
+      text-align: center;
+      font-size: 15px;
+      margin-bottom: 30px;
+      color: #555;
+    }
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      background-color: #ffb6c1;
+      color: white;
+      border: none;
+      margin-top: 30px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+    button:hover {
+      background-color: #ff85a2;
+    }
+    .footnote {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+    }
+  </style>
+  <script>
+    function showLoadingAndSubmit(form) {
+      const submitBtn = form.querySelector("button");
+      submitBtn.disabled = true;
+      submitBtn.innerText = "보내는 중... ✨";
+      setTimeout(() => {
+        form.submit();
+      }, 2000);
+    }
+  </script>
+</head>
+<body>
+
+  <h1>📮 실물 카드 리딩 요청</h1>
+  <p class="intro">
+    정성스러운 리딩이 필요하신가요?<br>
+    타로존이 직접 실물 카드를 뽑아드릴게요 🧙‍♀️✨
+  </p>
+
+  <form action="https://formsubmit.co/tarozon.com@gmail.com" method="POST" onsubmit="event.preventDefault(); showLoadingAndSubmit(this);">
+    <label>이름 또는 닉네임</label>
+    <input type="text" name="name" required>
+
+    <label>이메일 (답장을 받을 주소)</label>
+    <input type="email" name="email" required>
+
+    <label>질문 주제</label>
+    <select name="topic" required>
+      <option value="">-- 선택해주세요 --</option>
+      <option value="연애">💘 연애 / 관계</option>
+      <option value="진로">💼 일 / 진로</option>
+      <option value="금전">💰 금전 / 투자</option>
+      <option value="기타">🌟 기타</option>
+    </select>
+
+    <label>질문 내용을 자세히 적어주세요</label>
+    <textarea name="message" rows="7" placeholder="질문 배경, 고민 상황 등을 알려주시면 정확한 리딩에 도움이 돼요 💫" required></textarea>
+
+    <label>선호하는 카드 배열 방식 (선택)</label>
+    <input type="text" name="spread" placeholder="예: 3카드, 켈틱크로스 등">
+
+    <!-- 옵션 -->
+    <input type="hidden" name="_next" value="https://tarozon.com/thankyou.html">
+    <input type="hidden" name="_captcha" value="false">
+
+    <button type="submit">리딩 요청하기 💌</button>
+  </form>
+
+  <div class="footnote">
+    모든 리딩은 실물 카드로 정성껏 진행되며,<br>
+    답변은 1~3일 이내 메일로 드릴게요. 💖<br>
+    <em>※ 무분별한 반복 요청은 제한될 수 있어요!</em>
+  </div>
+
+</body>
+</html>

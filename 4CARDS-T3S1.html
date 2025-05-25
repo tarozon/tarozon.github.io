@@ -347,6 +347,27 @@
     <button id="generateBtn" onclick="generatePrompt()">리딩 요청문 만들기</button>
     <button id="copyBtn" onclick="copyPrompt()">📋 복사하기</button>
     <button id="gptJumpBtn" onclick="goToChatGPT()">🤖 ChatGPT로 이동</button>
+    <button onclick="window.open('contact.html', '_blank')" style="
+  padding: 5px 10px;
+  background-color: #ffc0da;
+  color: #6e3b4e;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1.5px solid #f9c46b;
+  cursor: pointer;
+  margin-left: 8px;
+  box-shadow: 0 0 6px rgba(255, 179, 218, 0.6), 0 0 4px rgba(249, 196, 107, 0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+"
+onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 10px rgba(255, 179, 218, 0.8), 0 0 6px rgba(249, 196, 107, 0.7)'"
+onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(255, 179, 218, 0.6), 0 0 4px rgba(249, 196, 107, 0.5)'"
+>
+  🌟 실물카드리딩
+</button>
+
+
+
+
     <pre id="outputArea" style="background:#fff3; padding:1em; white-space:pre-wrap; min-height:120px; font-family:monospace; text-align:left; margin-top: 10px;"></pre>
   </div>
 
