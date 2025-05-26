@@ -22,6 +22,63 @@ h1, h2 {
   padding: 20px;
 }
 
+/* 메인 메뉴 버튼 스타일 (index 전용) */
+.main-menu {
+  list-style: none;
+  padding: 0;
+  margin: 30px auto;
+  max-width: 500px;
+}
+
+.main-menu li {
+  margin-bottom: 14px;
+}
+
+.main-button {
+  display: block;
+  background-color: #ffd5eb;
+  color: #6e3b4e;
+  text-decoration: none;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.main-button:hover {
+  background-color: #ff91c9;
+  transform: translateY(-2px);
+}
+
+/* 안내 섹션 스타일 */
+.main-info {
+  max-width: 600px;
+  margin: 40px auto;
+  font-size: 15px;
+  line-height: 1.7;
+  padding: 20px;
+  background-color: #fff7fb;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.main-info h2 {
+  margin-top: 20px;
+  color: #a04370;
+}
+
+.main-info ul {
+  padding-left: 20px;
+  margin-top: 8px;
+}
+
+.main-info li {
+  margin-bottom: 8px;
+}
+
 /* 버튼 스타일 */
 button, .btn {
   background-color: #f3e1ff;
@@ -92,8 +149,6 @@ select {
   box-shadow: 0 0 10px rgba(255, 179, 218, 0.8), 0 0 6px rgba(249, 196, 107, 0.7);
 }
 
-
-
 /* 카드 이미지에 적용되는 fade-in 효과 */
 .card-slot img {
   transition: opacity 1.5s ease;
@@ -109,7 +164,6 @@ pre {
   font-family: monospace;
 }
 
-
 /* 푸터 디자인 */
 footer {
   margin-top: 40px;
@@ -117,7 +171,6 @@ footer {
   font-size: 13px;
   color: #999;
 }
-
 
 /* 모바일 반응형 여백 개선 */
 @media (max-width: 768px) {
