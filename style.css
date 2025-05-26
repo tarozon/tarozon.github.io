@@ -109,6 +109,16 @@ pre {
   font-family: monospace;
 }
 
+
+/* 푸터 디자인 */
+footer {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 13px;
+  color: #999;
+}
+
+
 /* 모바일 반응형 여백 개선 */
 @media (max-width: 768px) {
   body {
