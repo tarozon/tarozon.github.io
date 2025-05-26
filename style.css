@@ -1,5 +1,108 @@
-/* style.css (비활성화용 - 일단 아무것도 하지 않음) */
+/* 전체 기본 폰트 및 배경 톤 */
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: 'Helvetica Neue', sans-serif;
+  background-color: #fffdf2;
+  color: #333;
+}
 
-/* 향후 PC 스타일을 원할 때 여기에 추가하시면 됩니다. */
+/* 제목 스타일 */
+h1, h2 {
+  text-align: center;
+  color: #4b3b73;
+  margin-top: 20px;
+  margin-bottom: 16px;
+}
 
-/* 현재는 모바일 대응은 mobile.css에서 처리 중입니다. */
+/* 전체 레이아웃 중앙 정렬 */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 버튼 스타일 */
+button, .btn {
+  background-color: #f3e1ff;
+  color: #333;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease;
+}
+
+button:hover, .btn:hover {
+  background-color: #e4d0ff;
+}
+
+/* 셀렉트 박스 */
+select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* 홈 버튼: 좌상단 고정 */
+.home-button {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 999;
+  background-color: #f6e9ff;
+  color: #333;
+  text-decoration: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease;
+}
+
+.home-button:hover {
+  background-color: #e6d6ff;
+}
+
+/* 카드 이미지에 적용되는 fade-in 효과 */
+.card-slot img {
+  transition: opacity 1.5s ease;
+}
+
+/* 출력 결과용 pre 태그 */
+pre {
+  background-color: #faf5ff;
+  border: 1px solid #e4d4ff;
+  padding: 14px;
+  border-radius: 10px;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+
+/* 모바일 반응형 여백 개선 */
+@media (max-width: 768px) {
+  body {
+    padding: 16px;
+  }
+
+  .home-button {
+    top: 10px;
+    left: 10px;
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+
+  h1, h2 {
+    font-size: 20px;
+  }
+
+  button, .btn {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+}
