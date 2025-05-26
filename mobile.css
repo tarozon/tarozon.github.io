@@ -12,7 +12,8 @@
     line-height: 1.6;
     padding: 10px;
     background-color: #fffdf2;
-
+    
+    /* 🔥 핵심: 이미지 줄바꿈 없이 가로 나열 */
     white-space: nowrap;
     overflow-x: auto;
     overflow-y: auto;
@@ -53,31 +54,5 @@
 
   button:hover {
     background-color: #e4d0ff;
-  }
-}
-
-/* ✅ 세로 방향일 때만 카드들을 1열 세로 정렬 */
-@media only screen and (max-device-width: 768px) and (orientation: portrait) {
-  body {
-    white-space: normal !important;
-    overflow-x: hidden !important;
-    overflow-y: auto;
-  }
-
-  .spread {
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 20px !important;
-  }
-
-  .card-slot {
-    width: 90% !important;
-    max-width: 300px;
-    height: auto !important;
-  }
-
-  .card-slot img {
-    width: 100% !important;
-    height: auto !important;
   }
 }
