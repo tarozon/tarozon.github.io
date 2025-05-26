@@ -15,6 +15,15 @@ h1, h2 {
   margin-bottom: 16px;
 }
 
+/* 메인 서브타이틀 */
+.main-subtitle {
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+
 /* 전체 레이아웃 중앙 정렬 */
 .container {
   max-width: 900px;
@@ -35,7 +44,10 @@ h1, h2 {
 }
 
 .main-button {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   background-color: #ffd5eb;
   color: #6e3b4e;
   text-decoration: none;
@@ -46,6 +58,11 @@ h1, h2 {
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   text-align: center;
   transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.main-button .icon {
+  font-size: 18px;
+  color: #ff62a5;
 }
 
 .main-button:hover {
