@@ -69,6 +69,31 @@ select {
   background-color: #e6d6ff;
 }
 
+/* 실물리딩 오른쪽 상단 */
+.reading-button {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 999;
+  background-color: #ffc0da;
+  color: #6e3b4e;
+  font-weight: 500;
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 10px;
+  border: 1.5px solid #f9c46b;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(255, 179, 218, 0.6), 0 0 4px rgba(249, 196, 107, 0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.reading-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255, 179, 218, 0.8), 0 0 6px rgba(249, 196, 107, 0.7);
+}
+
+
+
 /* 카드 이미지에 적용되는 fade-in 효과 */
 .card-slot img {
   transition: opacity 1.5s ease;
@@ -104,5 +129,15 @@ pre {
   button, .btn {
     font-size: 14px;
     padding: 8px 12px;
+  }
+}
+
+/* 실물리딩요청버튼 반응형 */
+@media (max-width: 768px) {
+  .reading-button {
+    top: 10px;
+    right: 10px;
+    font-size: 13px;
+    padding: 6px 10px;
   }
 }
