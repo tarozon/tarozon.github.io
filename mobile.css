@@ -1,46 +1,26 @@
-/* 
-  mobile.css
-  모바일 기기(또는 너비 768px 이하)에서만 작동합니다.
-  이 파일은 style.css를 덮어쓰지 않으며,
-  오직 모바일 전용 대응만 수행합니다.
-*/
-
-/* 모바일 기기 조건에만 스타일 적용 */
 @media only screen and (max-device-width: 768px) {
-
-  html, body {
+  /* 공통 모바일 설정 (폰트, 버튼 등) */
+  body {
     font-size: 16px;
-    padding: 12px;
     line-height: 1.6;
+    padding: 10px;
     background-color: #fffdf2;
-
-    /* 🔥 중요: 스크롤과 확대 허용 관련 설정 */
-    overflow-x: auto;       /* 좌우 스크롤 허용 */
-    touch-action: manipulation; /* 모바일 브라우저에서 터치 제어 */
-    -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
   }
 
   h1, h2 {
     font-size: 20px;
     text-align: center;
+    white-space: normal;
   }
 
-  .selector-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: stretch;
-    margin-bottom: 20px;
-  }
-
-  select {
-    font-size: 16px;
-    padding: 8px;
-  }
-
-  button, .random-btn, #allRandomBtn, #shuffleBtn {
+  .selector-group, select, button, .random-btn, #allRandomBtn, #shuffleBtn {
+    white-space: normal;
     width: 100%;
-    font-size: 18px;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  button {
     padding: 12px;
     border-radius: 10px;
     background-color: #f3e1ff;
@@ -51,11 +31,40 @@
   button:hover {
     background-color: #e4d0ff;
   }
+}
+
+/* 👉 세로 방향일 때: 세로로 1장씩 나열 */
+@media only screen and (max-device-width: 768px) and (orientation: portrait) {
+  body {
+    white-space: normal;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
 
   img {
-    max-width: 100%;
-    height: auto;
     display: block;
-    margin: 10px auto;
+    width: 100%;
+    max-width: 350px;
+    margin: 12px auto;
+    height: auto;
+  }
+}
+
+/* 👉 가로 방향일 때: 지금처럼 가로 스크롤로 나열 */
+@media only screen and (max-device-width: 768px) and (orientation: landscape) {
+  body {
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  img {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    max-width: none;
+    margin: 8px;
+    vertical-align: top;
   }
 }
