@@ -1,58 +1,100 @@
 /*
   mobile.css
-  모바일 기기에서 카드 이미지들을 좌우로 스크롤 가능하게 구성합니다.
-  HTML은 수정하지 않으며, 이미지가 가로로 배치되어 스와이프할 수 있게 만듭니다.
+  모바일 기기에서 카드 이미지는 가로 스크롤, 버튼은 자연스럽게 정돈되게 구성
 */
 
 @media only screen and (max-device-width: 768px) {
 
-  /* 1. 전체 body를 스크롤 가능하게 */
   body {
     font-size: 16px;
     line-height: 1.6;
     padding: 10px;
     background-color: #fffdf2;
-    
-    /* 🔥 핵심: 이미지 줄바꿈 없이 가로 나열 */
-    white-space: nowrap;
-    overflow-x: auto;
+
+    overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  /* 2. 이미지 설정: inline-block + margin */
-  img {
-    display: inline-block;
-    width: auto;
-    height: auto;
-    max-width: none;
-    margin: 8px;
-    vertical-align: top;
+  /* 카드 스크롤 영역 */
+  .spread-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
   }
 
-  /* 3. 기본 UI 요소는 세로 유지 */
+  .spread {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    width: max-content;
+    gap: 12px;
+    padding-bottom: 10px;
+  }
+
+  .card-slot {
+    width: 144px;
+    height: 252px;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    flex-shrink: 0;
+  }
+
+  .card-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 2s ease;
+    opacity: 0;
+  }
+
+  .card-slot img.visible {
+    opacity: 1;
+  }
+
   h1, h2 {
     font-size: 20px;
     text-align: center;
-    white-space: normal;  /* 텍스트는 줄바꿈 유지 */
-  }
-
-  .selector-group, select, button, .random-btn, #allRandomBtn, #shuffleBtn {
     white-space: normal;
-    width: 100%;
-    font-size: 16px;
-    margin-bottom: 10px;
   }
 
-  button {
-    padding: 12px;
-    border-radius: 10px;
-    background-color: #f3e1ff;
+  /* 버튼 레이아웃: 자연스럽게 감싸기 */
+  #selectors {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+
+  .selector-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    max-width: 160px;
+    width: 100%;
+  }
+
+  select, button {
+    width: 100%;
+    font-size: 15px;
+    padding: 10px;
+    border-radius: 8px;
     border: none;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: #f3e1ff;
+    cursor: pointer;
   }
 
   button:hover {
     background-color: #e4d0ff;
   }
+
 }
