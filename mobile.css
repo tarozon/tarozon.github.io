@@ -1,16 +1,39 @@
+/*
+  mobile.css
+  모바일 기기에서 카드 이미지들을 좌우로 스크롤 가능하게 구성합니다.
+  HTML은 수정하지 않으며, 이미지가 가로로 배치되어 스와이프할 수 있게 만듭니다.
+*/
+
 @media only screen and (max-device-width: 768px) {
-  /* 모바일 기본 설정 (버튼, 텍스트 등만) */
+
+  /* 1. 전체 body를 스크롤 가능하게 */
   body {
     font-size: 16px;
     line-height: 1.6;
     padding: 10px;
     background-color: #fffdf2;
+
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
+  /* 2. 이미지 설정: inline-block + margin */
+  img {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    max-width: none;
+    margin: 8px;
+    vertical-align: top;
+  }
+
+  /* 3. 기본 UI 요소는 세로 유지 */
   h1, h2 {
     font-size: 20px;
     text-align: center;
-    white-space: normal;
+    white-space: normal;  /* 텍스트는 줄바꿈 유지 */
   }
 
   .selector-group, select, button, .random-btn, #allRandomBtn, #shuffleBtn {
@@ -33,38 +56,28 @@
   }
 }
 
-/* ✅ 세로 방향일 때만 이미지 1열로 변경 */
+/* ✅ 세로 방향일 때만 카드들을 1열 세로 정렬 */
 @media only screen and (max-device-width: 768px) and (orientation: portrait) {
-  img {
-    display: block;
-    width: 100%;
-    max-width: 350px;
-    margin: 12px auto;
-    height: auto;
-  }
-
   body {
-    white-space: normal;
-    overflow-x: hidden;
+    white-space: normal !important;
+    overflow-x: hidden !important;
     overflow-y: auto;
   }
-}
 
-/* ✅ 가로 방향일 때는 그대로 유지 (가로 스크롤) */
-@media only screen and (max-device-width: 768px) and (orientation: landscape) {
-  img {
-    display: inline-block;
-    width: auto;
-    height: auto;
-    max-width: none;
-    margin: 8px;
-    vertical-align: top;
+  .spread {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 20px !important;
   }
 
-  body {
-    white-space: nowrap;
-    overflow-x: auto;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+  .card-slot {
+    width: 90% !important;
+    max-width: 300px;
+    height: auto !important;
+  }
+
+  .card-slot img {
+    width: 100% !important;
+    height: auto !important;
   }
 }
