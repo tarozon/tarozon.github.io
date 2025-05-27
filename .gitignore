@@ -1,2 +1,6 @@
-.env
 .env.local
+# 기본적으로 무시할 항목들
+node_modules/
+.env
+.DS_Store
+.vercel
