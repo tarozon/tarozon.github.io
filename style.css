@@ -72,7 +72,8 @@ h1, h2 {
 
 /* 안내 섹션 스타일 */
 .main-info {
-  max-width: 600px;
+  max-width: 500px;  /* 메인 메뉴와 동일 */
+  width: 90%;        /* 반응형 유지 */
   margin: 40px auto;
   font-size: 15px;
   line-height: 1.7;
@@ -81,6 +82,7 @@ h1, h2 {
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
+
 
 .main-info h2 {
   margin-top: 20px;
