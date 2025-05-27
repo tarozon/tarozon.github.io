@@ -33,7 +33,9 @@ ${message}
       `
     });
 
-    res.status(200).json({ message: "메일 전송 완료!" });
+    // ✅ 메일 전송 완료 후 thankyou.html로 이동
+    res.redirect(302, "/thankyou.html");
+
   } catch (error) {
     console.error("메일 전송 실패", error);
     res.status(500).json({ message: "메일 전송 실패", error });
