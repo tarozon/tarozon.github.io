@@ -74,7 +74,7 @@
     타로존이 직접 실물 카드를 뽑아드릴게요 🧙‍♀️✨
   </p>
 
-  <form action="https://formsubmit.co/tarozon.com@gmail.com" method="POST" onsubmit="event.preventDefault(); showLoadingAndSubmit(this);">
+  <form action="/api/send-mail" method="POST" onsubmit="event.preventDefault(); showLoadingAndSubmit(this);">
     <label>이름 또는 닉네임</label>
     <input type="text" name="name" required>
 
@@ -95,10 +95,6 @@
 
     <label>선호하는 카드 배열 방식 (선택)</label>
     <input type="text" name="spread" placeholder="예: 3카드, 켈틱크로스 등">
-
-    <!-- 옵션 -->
-    <input type="hidden" name="_next" value="https://tarozon.com/thankyou.html">
-    <input type="hidden" name="_captcha" value="false">
 
     <button type="submit">리딩 요청하기 💌</button>
   </form>
