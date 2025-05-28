@@ -95,6 +95,10 @@
 
   <script>
     window.addEventListener("DOMContentLoaded", () => {
+    if (!localStorage.getItem("visitedTarozon")) {
+      alert("📌 이 메세지창은 첫 방문시에만 노출됩니다!\n\n🍎 iOS 사용자시라면 하단의 [공유 버튼(□↑)] → [홈 화면에 추가]를 눌러주세요!");
+      localStorage.setItem("visitedTarozon", "true");
+    }
       const ua = window.navigator.userAgent.toLowerCase();
       const isIOS = /iphone|ipad|ipod/.test(ua);
       const isAndroid = /android/.test(ua);
