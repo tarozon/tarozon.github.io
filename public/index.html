@@ -106,39 +106,43 @@
 </script>
 
 <script>
+  const ua = window.navigator.userAgent.toLowerCase();
+  const isIOS = /iphone|ipad|ipod/.test(ua);
+  const isAndroid = /android/.test(ua);
+  const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
   let deferredPrompt;
 
+  const installBtn = document.getElementById("installBtn");
+
+  // 공통 조건: 버튼 보여주기
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    document.getElementById('installBtn').style.display = 'inline-block';
+    if (!isIOS) {
+      installBtn.style.display = "inline-block";
+    }
   });
 
-  document.getElementById('installBtn').addEventListener('click', async () => {
-    if (deferredPrompt) {
+  if (isIOS && !isInStandaloneMode) {
+    installBtn.style.display = "inline-block";
+  }
+
+  // 하나로 통합된 클릭 핸들러
+  installBtn.addEventListener("click", async () => {
+    if (isIOS) {
+      alert("🍎 iOS 사용자시라면 하단의 [공유 버튼(□↑)] → [홈 화면에 추가]를 눌러주세요!");
+    } else if (deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        console.log('앱 설치됨');
+      if (outcome === "accepted") {
+        console.log("설치 완료!");
       }
       deferredPrompt = null;
+    } else {
+      alert("이 브라우저에서는 설치가 지원되지 않거나 이미 설치된 상태입니다!");
     }
   });
 </script>
-
-<script>
-  // iOS Safari인지 감지
-  const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-  const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
-
-  if (isIos && !isInStandaloneMode) {
-    document.getElementById('installBtn').style.display = 'inline-block';
-    document.getElementById('installBtn').addEventListener('click', () => {
-      alert("하단의 [공유 버튼(□↑)] → [홈 화면에 추가]를 눌러주세요!");
-    });
-  }
-</script>
-
 
 </body>
 </html>
