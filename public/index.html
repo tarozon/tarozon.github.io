@@ -86,5 +86,19 @@
       }
     });
   </script>
+
+  <script>
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const alreadyShown = localStorage.getItem("pwaInstallPromptShown");
+
+  if (isIOS && isSafari && !alreadyShown) {
+    setTimeout(() => {
+      alert("📱 홈 화면에 추가하시면 앱처럼 사용할 수 있어요!\n하단의 [공유 버튼 □↑] → [홈 화면에 추가]를 눌러주세요!");
+      localStorage.setItem("pwaInstallPromptShown", "true");
+    }, 2000);
+  }
+</script>
+
 </body>
 </html>
