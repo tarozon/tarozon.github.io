@@ -31,6 +31,11 @@
   <h1 class="main-title">🔮 TAROZON</h1>
   <p class="main-subtitle">질문을 미리 정하고, 신중하게 DRAW를 눌러주세요</p>
 
+  <div style="text-align: center; margin-top: 24px;">
+  <button id="installBtn" style="display: none;">📲 TAROZON 설치하기</button>
+</div>
+
+
   <ul class="main-menu">
     <li><a class="main-button" href="4CARDS-T3S1.html"><span class="icon">🂡🂢🂣🂤</span> 4카드 통합3 보조1</a></li>
     <li><a class="main-button" href="3CARDS-BASIC.html"><span class="icon">🂡🂢🂣</span> 3카드 과거 현재 미래</a></li>
@@ -99,6 +104,41 @@
     }, 2000);
   }
 </script>
+
+<script>
+  let deferredPrompt;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBtn').style.display = 'inline-block';
+  });
+
+  document.getElementById('installBtn').addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        console.log('앱 설치됨');
+      }
+      deferredPrompt = null;
+    }
+  });
+</script>
+
+<script>
+  // iOS Safari인지 감지
+  const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+  const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+
+  if (isIos && !isInStandaloneMode) {
+    document.getElementById('installBtn').style.display = 'inline-block';
+    document.getElementById('installBtn').addEventListener('click', () => {
+      alert("하단의 [공유 버튼(□↑)] → [홈 화면에 추가]를 눌러주세요!");
+    });
+  }
+</script>
+
 
 </body>
 </html>
