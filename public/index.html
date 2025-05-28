@@ -21,8 +21,6 @@
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/mobile.css" media="only screen and (max-width: 768px)">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
-
-  
 </head>
 <body>
   <a href="/" class="home-button">🏠 홈</a>
@@ -32,9 +30,8 @@
   <p class="main-subtitle">질문을 미리 정하고, 신중하게 DRAW를 눌러주세요</p>
 
   <div style="text-align: center; margin-top: 24px;">
-  <button id="installBtn" style="display: none;">📲 TAROZON 설치하기</button>
-</div>
-
+    <button id="installBtn" style="display: none;">📲 TAROZON 설치하기</button>
+  </div>
 
   <ul class="main-menu">
     <li><a class="main-button" href="4CARDS-T3S1.html"><span class="icon">🂡🂢🂣🂤</span> 4카드 통합3 보조1</a></li>
@@ -50,19 +47,19 @@
     <h2>📝 안내 사항</h2>
     <ul>
       <li>PC버전 추천, 모바일 이용 가능</li>
-      <li>모바일 이용시 가로 회전 추천</li>
+      <li>모바일 이용 시 가로 회전 추천</li>
       <li>카드 수동 임의 선택 가능</li>
     </ul>
 
     <h2>⚙️ 기능 안내</h2>
     <ul>
-      <li><b>DRAW:</b> 카드를 한장씩 오픈</li>
+      <li><b>DRAW:</b> 카드를 한 장씩 오픈</li>
       <li><b>FLIP:</b> 카드 정/역 변환</li>
       <li><b>CAPTURE:</b> 선택된 카드를 그림파일로 저장</li>
-      <li><b>리딩요청문 만들기:</b> 뽑은카드를 텍스트로 정리</li>
+      <li><b>리딩요청문 만들기:</b> 뽑은 카드를 텍스트로 정리</li>
     </ul>
 
-    <h2>✨ 기타기능</h2>
+    <h2>✨ 기타 기능</h2>
     <ul>
       <li>DRAW ALL: 원클릭 오픈</li>
       <li>New Spread: 전부 리셋</li>
@@ -93,56 +90,42 @@
   </script>
 
   <script>
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  const alreadyShown = localStorage.getItem("pwaInstallPromptShown");
+    window.addEventListener("DOMContentLoaded", () => {
+      const ua = window.navigator.userAgent.toLowerCase();
+      const isIOS = /iphone|ipad|ipod/.test(ua);
+      const isAndroid = /android/.test(ua);
+      const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+      let deferredPrompt;
 
-  if (isIOS && isSafari && !alreadyShown) {
-    setTimeout(() => {
-      alert("📱 홈 화면에 추가하시면 앱처럼 사용할 수 있어요!\n하단의 [공유 버튼 □↑] → [홈 화면에 추가]를 눌러주세요!");
-      localStorage.setItem("pwaInstallPromptShown", "true");
-    }, 2000);
-  }
-</script>
+      const installBtn = document.getElementById("installBtn");
 
-<script>
-  const ua = window.navigator.userAgent.toLowerCase();
-  const isIOS = /iphone|ipad|ipod/.test(ua);
-  const isAndroid = /android/.test(ua);
-  const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
-  let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (!isIOS) {
+          installBtn.style.display = "inline-block";
+        }
+      });
 
-  const installBtn = document.getElementById("installBtn");
-
-  // 공통 조건: 버튼 보여주기
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    if (!isIOS) {
-      installBtn.style.display = "inline-block";
-    }
-  });
-
-  if (isIOS && !isInStandaloneMode) {
-    installBtn.style.display = "inline-block";
-  }
-
-  // 하나로 통합된 클릭 핸들러
-  installBtn.addEventListener("click", async () => {
-    if (isIOS) {
-      alert("🍎 iOS 사용자시라면 하단의 [공유 버튼(□↑)] → [홈 화면에 추가]를 눌러주세요!");
-    } else if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === "accepted") {
-        console.log("설치 완료!");
+      if (isIOS && !isInStandaloneMode) {
+        installBtn.style.display = "inline-block";
       }
-      deferredPrompt = null;
-    } else {
-      alert("이 브라우저에서는 설치가 지원되지 않거나 이미 설치된 상태입니다!");
-    }
-  });
-</script>
 
+      installBtn.addEventListener("click", async () => {
+        if (isIOS) {
+          alert("🍎 iOS 사용자시라면 하단의 [공유 버튼(□↑)] → [홈 화면에 추가]를 눌러주세요!");
+        } else if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if (outcome === "accepted") {
+            console.log("설치 완료!");
+          }
+          deferredPrompt = null;
+        } else {
+          alert("이 브라우저에서는 설치가 지원되지 않거나 이미 설치된 상태입니다!");
+        }
+      });
+    });
+  </script>
 </body>
 </html>
