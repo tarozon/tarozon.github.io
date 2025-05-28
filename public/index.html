@@ -47,7 +47,7 @@
     <h2>📝 안내 사항</h2>
     <ul>
       <li>PC버전 추천, 모바일 이용 가능</li>
-      <li>모바일 이용 시 가로 회전 추천</li>
+      <li>모바일 이용 시 가로 회전 가능</li>
       <li>카드 수동 임의 선택 가능</li>
     </ul>
 
@@ -66,6 +66,10 @@
       <li>실물카드리딩: 실제 카드 뽑기 + 리딩 (오픈 예정)</li>
     </ul>
   </section>
+<!-- 원하는 위치에 추가 -->
+<div style="text-align: center; margin-top: 40px;">
+  <button id="installBtnAlways">📲 TAROZON 다시 설치하기</button>
+</div>
 
   <footer>
     © 2025 타로존 TaroZon.com
@@ -127,5 +131,31 @@
       });
     });
   </script>
+
+  <!-- 기존 스크립트들 아래 아무 데나 추가 -->
+<script>
+  const installBtnAlways = document.getElementById("installBtnAlways");
+
+  installBtnAlways.addEventListener("click", async () => {
+    const ua = window.navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(ua);
+    const isAndroid = /android/.test(ua);
+    const isInStandaloneMode = ('standalone' in window.navigator) && window.navigator.standalone;
+
+    if (isIOS) {
+      alert("🍎 iOS 사용자는 하단의 [공유 버튼(□↑)] → [홈 화면에 추가]를 눌러주세요!");
+    } else if (window.deferredPrompt) {
+      window.deferredPrompt.prompt();
+      const { outcome } = await window.deferredPrompt.userChoice;
+      if (outcome === "accepted") {
+        console.log("설치 완료!");
+      }
+      window.deferredPrompt = null;
+    } else {
+      alert("이미 설치되었거나 설치가 지원되지 않는 환경이에요 🙇‍♀️");
+    }
+  });
+</script>
+
 </body>
 </html>
