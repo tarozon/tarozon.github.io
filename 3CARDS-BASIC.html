@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <!-- PWA / iOS 지원 메타태그 -->
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#ff77aa" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -12,29 +11,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tarot 3-Card Spread</title>
-  <link rel="stylesheet" href="style.css">        <!-- 기본 PC 스타일 -->
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/mobile.css" media="only screen and (max-width: 768px)">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
-  <!-- 드래그 방지 -->
   <style>
     * {
       -webkit-user-select: none;
       -ms-user-select: none;
       user-select: none;
     }
-  </style>
-
-   <style>
-    * {
-      -webkit-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-  </style>
-
-  <style>
     body {
       font-family: sans-serif;
       display: flex;
@@ -81,15 +67,17 @@
       align-items: center;
       justify-content: center;
       background-color: white;
+      overflow: hidden; /* 이미지가 슬롯을 넘어가지 않도록 */
     }
     .card-slot img {
       height: 100%;
       width: auto;
       object-fit: contain;
 
-      /* ✅ 2초 동안 천천히 나타나는 감성 연출 (회전은 transition 없음) */
-      transition: opacity 2s ease;
+      /* 7번 요청 반영: FLIP 버튼을 위한 transform transition 추가 (DRAW 시에는 JS에서 임시 제거) */
+      transition: opacity 2s ease, transform 0.5s ease;
       opacity: 0;
+      transform: rotate(0deg); /* 초기 상태 설정 */
     }
     .card-slot img.visible {
       opacity: 1;
@@ -104,14 +92,15 @@
 
   <h1>🃏 3-Card Spread (과거 - 현재 - 미래) 🃏</h1>
   <div id="selectors"></div>
-<div class="spread-wrapper">
-  <div class="spread">
-    <div class="card-slot"><img id="img1" /></div>
-    <div class="card-slot"><img id="img2" /></div>
-    <div class="card-slot"><img id="img3" /></div>
+  <div class="spread-wrapper">
+    <div class="spread">
+      <div class="card-slot"><img id="img1" /></div>
+      <div class="card-slot"><img id="img2" /></div>
+      <div class="card-slot"><img id="img3" /></div>
+    </div>
   </div>
-</div>
   <script>
+    // 4번 요청 반영: cardList와 positions는 많은 함수에서 필요하므로 전역 스코프 유지
     const positions = ["과거", "현재", "미래"];
     const cardList = [
       ["The Fool","00"],["The Magician","01"],["The High Priestess","02"],["The Empress","03"],
@@ -152,6 +141,7 @@
         cardList.forEach(([name, code], idx) => {
           const opt = document.createElement('option');
           opt.value = code;
+          // 3번 요청 반영: 메이저 아르카나만 번호 표시 (idx < 22)
           opt.text = idx < 22 ? `${code} ${name}` : name;
           select.appendChild(opt);
         });
@@ -162,14 +152,20 @@
           if (code) {
             const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)';
             img.src = `cards/${code}.jpg`;
+            
+            // 7번 요청 반영: DRAW 시에는 transform transition 임시 제거하여 즉시 회전
+            img.style.transition = 'opacity 2s ease'; 
             img.style.transform = rot;
             img.style.width = '100%';
             img.style.height = '100%';
             img.style.objectFit = 'cover';
 
-            // ✅ 감성 효과: 2초 천천히 등장 + 회전 애니메이션 없이 즉시 회전
             img.classList.remove('visible');
-            setTimeout(() => img.classList.add('visible'), 10);
+            setTimeout(() => {
+                img.classList.add('visible');
+                // 7번 요청 반영: FLIP 버튼을 위해 다시 transform transition 추가
+                img.style.transition = 'opacity 2s ease, transform 0.5s ease'; 
+            }, 10);
           } else {
             img.src = '';
             img.classList.remove('visible');
@@ -199,6 +195,7 @@
           const img = document.getElementById(`img${i + 1}`);
           const current = img.style.transform || 'rotate(0deg)';
           const rotated = current.includes('180deg') ? 'rotate(0deg)' : 'rotate(180deg)';
+          // 7번 요청 반영: FLIP 시에는 transition이 적용되도록 CSS에 설정됨
           img.style.transform = rotated;
         });
 
@@ -243,9 +240,9 @@
         try {
           const canvas = await html2canvas(element);
           canvas.toBlob((blob) => {
-  autoDownload(blob); // 자동 저장 함수 호출
-  alert('스프레드가 저장되었어요! 😊');
-}, 'image/jpeg');
+            autoDownload(blob); // 자동 저장 함수 호출
+            alert('스프레드가 저장되었어요! 😊'); // 5번 요청 반영: 다운로드 시작 알림
+          }, 'image/jpeg');
 
         } catch (err) {
           console.error(err);
@@ -257,12 +254,10 @@
     };
   </script>
 
-  <!-- 오른쪽 클릭 방지 -->
-    <script>
+  <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
   </script>
 
-  <!-- 단축키 방지 -->
   <script>
     document.addEventListener('keydown', function (e) {
       if (
@@ -274,15 +269,15 @@
       }
     });
   </script>
-<script>
-function autoDownload(imageBlob) {
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(imageBlob);
-  a.download = "tarozon-capture.jpg";
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-</script>
+  <script>
+    function autoDownload(imageBlob) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(imageBlob);
+      a.download = "tarozon-capture.jpg";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+  </script>
 </body>
 
 </html>
@@ -317,40 +312,42 @@ onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(
 </div>
 
 <script>
-function getCardName(imgId) {
-  const img = document.getElementById(imgId);
-  if (!img || !img.src) return "(선택되지 않음)";
-  const code = img.src.split("/").pop().replace(".jpg", "");
-  const found = cardList.find(([_, c]) => c === code);
-  return found ? found[0] : code;
-}
-
-function generatePrompt() {
-  const question = document.getElementById("userQuestion").value.trim() || "(질문 내용 없음)";
-  const cardNames = [
-    getCardName("img1"),
-    getCardName("img2"),
-    getCardName("img3")
-  ];
-
-  const promptText = `내 상황은 다음과 같아:\n${question}\n\n사용한 카드는 라이더 웨이트 덱이고, 뽑은 카드는 아래와 같아.\n- 과거: ${cardNames[0]}\n- 현재: ${cardNames[1]}\n- 미래: ${cardNames[2]}\n\n이 카드들을 바탕으로 현재 관계를 어떻게 해석할 수 있을까? 자세히 설명해줘.`;
-
-  document.getElementById("outputArea").textContent = promptText;
-}
-
-function copyPrompt() {
-  const text = document.getElementById("outputArea").textContent;
-  navigator.clipboard.writeText(text).then(() => alert("복사되었어요! GPT에 붙여넣기 하세요 ✨"));
-}
-
-function goToChatGPT() {
-  const text = document.getElementById("outputArea").textContent;
-  if (!text.trim()) {
-    alert("먼저 리딩 요청문을 생성해 주세요!");
-    return;
+  // 4번 요청 반영: 함수들 전역 스코프 유지 (HTML onclick 때문)
+  function getCardName(imgId) {
+    const img = document.getElementById(imgId);
+    if (!img || !img.src) return "(선택되지 않음)";
+    const code = img.src.split("/").pop().replace(".jpg", "");
+    const found = cardList.find(([_, c]) => c === code);
+    return found ? found[0] : code; // 3번 요청 반영: 메이저 아르카나만 번호/이름 함께 표시 (카드 리스트 생성 시 적용)
   }
-  navigator.clipboard.writeText(text).then(() => {
-    window.open("https://chat.openai.com", "_blank");
-  });
-}
+
+  function generatePrompt() {
+    const question = document.getElementById("userQuestion").value.trim() || "(질문 내용 없음)";
+    const cardNames = [
+      getCardName("img1"),
+      getCardName("img2"),
+      getCardName("img3")
+    ];
+
+    const promptText = `내 상황은 다음과 같아:\n${question}\n\n사용한 카드는 라이더 웨이트 덱이고, 뽑은 카드는 아래와 같아.\n- 과거: ${cardNames[0]}\n- 현재: ${cardNames[1]}\n- 미래: ${cardNames[2]}\n\n이 카드들을 바탕으로 현재 관계를 어떻게 해석할 수 있을까? 자세히 설명해줘.`;
+
+    document.getElementById("outputArea").textContent = promptText;
+  }
+
+  function copyPrompt() {
+    const text = document.getElementById("outputArea").textContent;
+    navigator.clipboard.writeText(text).then(() => alert("복사되었어요! GPT에 붙여넣기 하세요 ✨"));
+  }
+
+  function goToChatGPT() {
+    const text = document.getElementById("outputArea").textContent;
+    if (!text.trim()) {
+      alert("먼저 리딩 요청문을 생성해 주세요!");
+      return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+      alert("리딩 요청문이 복사되었습니다. ChatGPT로 이동합니다."); // 6번 요청 반영: 복사 성공 알림
+      window.open("https://chat.openai.com", "_blank");
+    });
+  }
 </script>
