@@ -235,33 +235,11 @@
         const element = document.querySelector('.spread');
         try {
           const canvas = await html2canvas(element);
-          canvas.toBlob(async (blob) => {
-            let done = false;
-            if (window.showSaveFilePicker) {
-              try {
-                const opts = {
-                  types: [{ description: 'JPEG image', accept: {'image/jpeg': ['.jpg', '.jpeg']} }]
-                };
-                const fileHandle = await window.showSaveFilePicker({ ...opts, suggestedName: 'spread.jpg' });
-                const writable = await fileHandle.createWritable();
-                await writable.write(blob);
-                await writable.close();
-                done = true;
-              } catch (e) { console.warn('showSaveFilePicker 실패, 대체 다운로드 사용', e); }
-            }
-            if (!done) {
-              const url = URL.createObjectURL(blob);
-              const filename = prompt('저장할 파일명(.jpg) 입력:', 'spread.jpg') || 'spread.jpg';
-              const link = document.createElement('a');
-              link.href = url;
-              link.download = filename;
-              document.body.appendChild(link);
-              link.click();
-              link.remove();
-              URL.revokeObjectURL(url);
-            }
-            alert('스프레드가 저장되었어요! 😊');
-          }, 'image/jpeg');
+          canvas.toBlob((blob) => {
+  autoDownload(blob); // 자동 저장 함수 호출
+  alert('스프레드가 저장되었어요! 😊');
+}, 'image/jpeg');
+
         } catch (err) {
           console.error(err);
           alert('캡처에 실패했어요… 콘솔을 확인해 주세요.');
@@ -289,7 +267,17 @@
       }
     });
   </script>
+<script>
+function autoDownload(imageBlob) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(imageBlob);
+  a.download = "tarozon-capture.jpg";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+</script>
 </body>
+
 </html>
 
   <div id="reading-section" style="margin-top: 40px; max-width: 800px; width: 90%; text-align: center;">
