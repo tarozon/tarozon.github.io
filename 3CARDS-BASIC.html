@@ -67,17 +67,16 @@
       align-items: center;
       justify-content: center;
       background-color: white;
-      overflow: hidden; /* 이미지가 슬롯을 넘어가지 않도록 */
+      overflow: hidden;
     }
     .card-slot img {
       height: 100%;
       width: auto;
       object-fit: contain;
 
-      /* 7번 요청 반영: FLIP 버튼을 위한 transform transition 추가 (DRAW 시에는 JS에서 임시 제거) */
       transition: opacity 2s ease, transform 0.5s ease;
       opacity: 0;
-      transform: rotate(0deg); /* 초기 상태 설정 */
+      transform: rotate(0deg);
     }
     .card-slot img.visible {
       opacity: 1;
@@ -100,7 +99,6 @@
     </div>
   </div>
   <script>
-    // 4번 요청 반영: cardList와 positions는 많은 함수에서 필요하므로 전역 스코프 유지
     const positions = ["과거", "현재", "미래"];
     const cardList = [
       ["The Fool","00"],["The Magician","01"],["The High Priestess","02"],["The Empress","03"],
@@ -141,7 +139,6 @@
         cardList.forEach(([name, code], idx) => {
           const opt = document.createElement('option');
           opt.value = code;
-          // 3번 요청 반영: 메이저 아르카나만 번호 표시 (idx < 22)
           opt.text = idx < 22 ? `${code} ${name}` : name;
           select.appendChild(opt);
         });
@@ -153,8 +150,7 @@
             const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)';
             img.src = `cards/${code}.jpg`;
             
-            // 7번 요청 반영: DRAW 시에는 transform transition 임시 제거하여 즉시 회전
-            img.style.transition = 'opacity 2s ease'; 
+            img.style.transition = 'opacity 2s ease';
             img.style.transform = rot;
             img.style.width = '100%';
             img.style.height = '100%';
@@ -163,7 +159,6 @@
             img.classList.remove('visible');
             setTimeout(() => {
                 img.classList.add('visible');
-                // 7번 요청 반영: FLIP 버튼을 위해 다시 transform transition 추가
                 img.style.transition = 'opacity 2s ease, transform 0.5s ease'; 
             }, 10);
           } else {
@@ -195,7 +190,6 @@
           const img = document.getElementById(`img${i + 1}`);
           const current = img.style.transform || 'rotate(0deg)';
           const rotated = current.includes('180deg') ? 'rotate(0deg)' : 'rotate(180deg)';
-          // 7번 요청 반영: FLIP 시에는 transition이 적용되도록 CSS에 설정됨
           img.style.transform = rotated;
         });
 
@@ -240,8 +234,8 @@
         try {
           const canvas = await html2canvas(element);
           canvas.toBlob((blob) => {
-            autoDownload(blob); // 자동 저장 함수 호출
-            alert('스프레드가 저장되었어요! 😊'); // 5번 요청 반영: 다운로드 시작 알림
+            autoDownload(blob);
+            alert('스프레드가 저장되었어요! 😊');
           }, 'image/jpeg');
 
         } catch (err) {
@@ -273,7 +267,9 @@
     function autoDownload(imageBlob) {
       const a = document.createElement("a");
       a.href = URL.createObjectURL(imageBlob);
-      a.download = "tarozon-capture.jpg";
+      // 파일 이름에 타임스탬프를 추가하여 고유하게 만듭니다.
+      const timestamp = new Date().toISOString().replace(/[:.-]/g, '');
+      a.download = `tarozon-capture-${timestamp}.jpg`;
       a.click();
       URL.revokeObjectURL(a.href);
     }
@@ -312,13 +308,12 @@ onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(
 </div>
 
 <script>
-  // 4번 요청 반영: 함수들 전역 스코프 유지 (HTML onclick 때문)
   function getCardName(imgId) {
     const img = document.getElementById(imgId);
     if (!img || !img.src) return "(선택되지 않음)";
     const code = img.src.split("/").pop().replace(".jpg", "");
     const found = cardList.find(([_, c]) => c === code);
-    return found ? found[0] : code; // 3번 요청 반영: 메이저 아르카나만 번호/이름 함께 표시 (카드 리스트 생성 시 적용)
+    return found ? found[0] : code;
   }
 
   function generatePrompt() {
@@ -346,7 +341,7 @@ onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(
       return;
     }
     navigator.clipboard.writeText(text).then(() => {
-      alert("리딩 요청문이 복사되었습니다. ChatGPT로 이동합니다."); // 6번 요청 반영: 복사 성공 알림
+      alert("리딩 요청문이 복사되었습니다. ChatGPT로 이동합니다.");
       window.open("https://chat.openai.com", "_blank");
     });
   }
