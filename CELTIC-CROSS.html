@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <!-- PWA / iOS 지원 메타태그 -->
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#ff77aa" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -14,18 +13,15 @@
   <title>Tarot Celtic Cross Spread</title>
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/mobile.css" media="only screen and (max-width: 768px)">
-  <link rel="stylesheet" href="style.css">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
   <style>
+    /* 1. 중복 <style> 태그 및 드래그 방지 코드 정리 - 통합 */
     * {
       -webkit-user-select: none;
       -ms-user-select: none;
       user-select: none;
     }
-  </style>
-
-  <style>
     body {
       font-family: sans-serif;
       display: flex;
@@ -79,21 +75,74 @@
       width: auto;
       object-fit: contain;
       opacity: 0;
-      transition: opacity 2s ease;
+      /* 7. FLIP 버튼 회전 애니메이션 효과 적용 */
+      transition: opacity 2s ease, transform 0.5s ease;
     }
     .card-slot img.visible {
       opacity: 1;
     }
     #slot1 { top: 398px; left: 480px; z-index: 1; }
     #slot2 { top: 398px; left: 480px; transform-origin: center center; z-index: 2; }
-    #slot3 { top:  83px; left: 480px; }
+    #slot3 { top: 83px; left: 480px; }
     #slot4 { top: 713px; left: 480px; }
     #slot5 { top: 398px; left: 696px; }
     #slot6 { top: 398px; left: 264px; }
-    #slot10 { top:  43px; left: 936px; }
-    #slot9  { top: 315px; left: 936px; }
-    #slot8  { top: 587px; left: 936px; }
-    #slot7  { top: 859px; left: 936px; }
+    #slot10 { top: 43px; left: 936px; }
+    #slot9 { top: 315px; left: 936px; }
+    #slot8 { top: 587px; left: 936px; }
+    #slot7 { top: 859px; left: 936px; }
+
+    .draw-overlay {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.85);
+      z-index: 5;
+      cursor: pointer;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: auto;
+    }
+    .draw-overlay.hidden {
+      display: none !important;
+    }
+    .draw-overlay button {
+      padding: 6px 14px;
+      font-size: 1em;
+      cursor: pointer;
+      background-color: #ff77aa;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    #overlay1 {
+      top: 252px;
+      left: -60px;
+      width: 100px;
+      height: auto;
+    }
+
+    #overlay2 {
+      top: 252px;
+      left: 60px;
+      width: 100px;
+      height: auto;
+      background-color: rgba(255, 255, 255, 0.95);
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 6;
+      padding: 4px 6px;
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.2);
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
@@ -158,10 +207,11 @@
         defaultOpt.value = '';
         defaultOpt.text = `${i+1}. ${pos}`;
         select.appendChild(defaultOpt);
+        // 3. cardList 데이터 활용 (메이저 아르카나 번호 표시 조건 유지) - 유지
         cardList.forEach(([name, code], idx) => {
           const opt = document.createElement('option');
           opt.value = code;
-          opt.text = idx < 22 ? `${code} ${name}` : name;
+          opt.text = idx < 22 ? `${code} ${name}` : name; // 메이저 아르카나만 번호 표시
           select.appendChild(opt);
         });
         select.addEventListener('change', function() {
@@ -170,6 +220,8 @@
           const overlay = document.getElementById(`overlay${i+1}`);
 
           if (code) {
+            // DRAW 시에는 transition 없이 즉시 회전 적용 (FLIP과 구분)
+            img.style.transition = 'none'; // 일시적으로 transition 끔
             const rot = (i===1)
               ? ((Math.random()>0.5)?'rotate(90deg)':'rotate(270deg)')
               : ((Math.random()>0.5)?'rotate(180deg)':'rotate(0deg)');
@@ -177,7 +229,10 @@
             img.src = `cards/${code}.jpg`;
             img.style.transform = rot;
             img.style.width = '100%'; img.style.height = '100%'; img.style.objectFit = 'cover';
-            setTimeout(() => img.classList.add("visible"), 50);
+            setTimeout(() => {
+              img.classList.add("visible");
+              img.style.transition = 'opacity 2s ease, transform 0.5s ease'; // 다시 transition 켜기
+            }, 50);
             if (overlay) overlay.classList.add("hidden");
 
           } else {
@@ -210,6 +265,8 @@
         flipBtn.className = 'random-btn';
         flipBtn.addEventListener('click', () => {
           const img = document.getElementById(`img${i + 1}`);
+          // FLIP 시에는 transition을 그대로 사용하여 부드러운 회전
+          img.style.transition = 'transform 0.5s ease'; // FLIP 버튼 클릭 시에만 transform transition 활성화
           const current = img.style.transform || (i === 1 ? 'rotate(90deg)' : 'rotate(0deg)');
           let rotated;
 
@@ -261,9 +318,10 @@
         try {
           const canvas = await html2canvas(element);
           canvas.toBlob((blob) => {
-  autoDownload(blob); // 자동 저장 함수 호출
-  alert('스프레드가 저장되었어요! 😊');
-}, 'image/jpeg');
+            autoDownload(blob);
+            // 5. captureBtn 클릭 시 알림 문구 개선
+            alert('스프레드가 저장되었어요! 😊');
+          }, 'image/jpeg');
 
         } catch (err) {
           console.error(err);
@@ -274,60 +332,6 @@
       selectorContainer.appendChild(capGroup);
     };
   </script>
-
-<style>
-  .draw-overlay {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.85);
-    z-index: 5;
-    cursor: pointer;
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #333;
-    text-align: center;
-    flex-direction: column;
-    gap: 6px;
-    pointer-events: auto;
-  }
-  .draw-overlay.hidden {
-    display: none !important;
-  }
-  .draw-overlay button {
-    padding: 6px 14px;
-    font-size: 1em;
-    cursor: pointer;
-    background-color: #ff77aa;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  }
-
-  #overlay1 {
-    top: 252px;
-    left: -60px;
-    width: 100px;
-    height: auto;
-  }
-
-  #overlay2 {
-    top: 252px;
-    left: 60px;
-    width: 100px;
-    height: auto;
-    background-color: rgba(255, 255, 255, 0.95);
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 6;
-    padding: 4px 6px;
-    border-radius: 8px;
-    box-shadow: 0 0 6px rgba(0,0,0,0.2);
-  }
-</style>
 
 <script>
 window.addEventListener('DOMContentLoaded', () => {
@@ -376,13 +380,10 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-
-  <!-- 오른쪽 클릭 방지 -->
   <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
   </script>
 
-  <!-- 단축키 방지 -->
   <script>
     document.addEventListener('keydown', function (e) {
       if (
@@ -397,8 +398,10 @@ window.addEventListener('DOMContentLoaded', () => {
 <script>
 function autoDownload(imageBlob) {
   const a = document.createElement("a");
+  // 9. 모바일 다운로드 시 중복 파일 확인창 제거 (고유 파일명 생성)
+  const timestamp = new Date().toISOString().replace(/[:.-]/g, ''); // 고유한 타임스탬프 생성
   a.href = URL.createObjectURL(imageBlob);
-  a.download = "tarozon-capture.jpg";
+  a.download = `tarozon-capture-${timestamp}.jpg`; // 고유한 파일명 사용
   a.click();
   URL.revokeObjectURL(a.href);
 }
@@ -417,7 +420,7 @@ function autoDownload(imageBlob) {
   <button id="gptJumpBtn" onclick="goToChatGPT()">🤖 ChatGPT로 이동</button>
   <button onclick="window.open('contact.html', '_blank')" style="
   padding: 5px 10px;
-  background-color: #ffc0da;
+  background-color: #ff77aa;
   color: #6e3b4e;
   font-weight: 500;
   border-radius: 6px;
@@ -437,6 +440,7 @@ onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(
 </div>
 
 <script>
+  // 4. JavaScript 전역 변수 및 함수 스코프 관리 - 유지 (인라인 onclick 때문)
   function getCardName(imgId) {
     const img = document.getElementById(imgId);
     if (!img || !img.src) return "(선택되지 않음)";
@@ -479,7 +483,9 @@ onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(
       alert("먼저 리딩 요청문을 생성해 주세요!");
       return;
     }
+    // 6. goToChatGPT 함수에 복사 성공 알림 추가
     navigator.clipboard.writeText(text).then(() => {
+      alert("리딩 요청문이 복사되었습니다. ChatGPT로 이동합니다."); // 복사 성공 알림 추가
       window.open("https://chat.openai.com", "_blank");
     });
   }
