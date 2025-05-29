@@ -167,6 +167,8 @@
         select.addEventListener('change', function() {
           const code = this.value;
           const img = document.getElementById(`img${i+1}`);
+          const overlay = document.getElementById(`overlay${i+1}`);
+
           if (code) {
             const rot = (i===1)
               ? ((Math.random()>0.5)?'rotate(90deg)':'rotate(270deg)')
@@ -176,9 +178,12 @@
             img.style.transform = rot;
             img.style.width = '100%'; img.style.height = '100%'; img.style.objectFit = 'cover';
             setTimeout(() => img.classList.add("visible"), 50);
+            if (overlay) overlay.classList.add("hidden");
+
           } else {
             img.src = '';
             img.classList.remove("visible");
+            if (overlay) overlay.classList.remove("hidden");
           }
         });
 
@@ -269,6 +274,108 @@
       selectorContainer.appendChild(capGroup);
     };
   </script>
+
+<style>
+  .draw-overlay {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.85);
+    z-index: 5;
+    cursor: pointer;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    flex-direction: column;
+    gap: 6px;
+    pointer-events: auto;
+  }
+  .draw-overlay.hidden {
+    display: none !important;
+  }
+  .draw-overlay button {
+    padding: 6px 14px;
+    font-size: 1em;
+    cursor: pointer;
+    background-color: #ff77aa;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+
+  #overlay1 {
+    top: 252px;
+    left: -60px;
+    width: 100px;
+    height: auto;
+  }
+
+  #overlay2 {
+    top: 252px;
+    left: 60px;
+    width: 100px;
+    height: auto;
+    background-color: rgba(255, 255, 255, 0.95);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 6;
+    padding: 4px 6px;
+    border-radius: 8px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.2);
+  }
+</style>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  const overlays = [];
+  for (let i = 1; i <= 10; i++) {
+    const slot = document.getElementById(`slot${i}`);
+    const overlay = document.createElement('div');
+    overlay.className = 'draw-overlay';
+    overlay.id = `overlay${i}`;
+
+    const label = document.createElement('div');
+    label.textContent = `${positions[i - 1]}`;
+    overlay.appendChild(label);
+
+    const btn = document.createElement('button');
+    btn.textContent = 'DRAW';
+    btn.addEventListener('click', () => {
+      const select = document.querySelectorAll('select')[i - 1];
+      const selects = Array.from(document.querySelectorAll('select'));
+      const used = selects.map((s, j) => j === i - 1 ? null : s.value).filter(v => v);
+      const avail = cardList.map(c => c[1]).filter(c => !used.includes(c));
+      if (!avail.length) return;
+      const code = avail[Math.floor(Math.random() * avail.length)];
+      select.value = code;
+      select.dispatchEvent(new Event('change'));
+    });
+    overlay.appendChild(btn);
+
+    slot.appendChild(overlay);
+    overlays.push(overlay);
+  }
+
+  // 이미지 바뀔 때마다 오버레이 숨김 처리
+  const selects = document.querySelectorAll('select');
+  selects.forEach((sel, i) => {
+    const overlay = document.getElementById(`overlay${i + 1}`);
+    const updateOverlayVisibility = () => {
+      if (overlay) {
+        if (sel.value) overlay.classList.add('hidden');
+        else overlay.classList.remove('hidden');
+      }
+    };
+    sel.addEventListener('change', updateOverlayVisibility);
+    updateOverlayVisibility(); // 페이지 로드시 상태 동기화
+  });
+});
+</script>
+
 
   <!-- 오른쪽 클릭 방지 -->
   <script>

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <!-- PWA / iOS 지원 메타태그 -->
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#ff77aa" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -14,7 +13,6 @@
   <title>·말편자 배열법</title>
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/mobile.css" media="only screen and (max-width: 768px)">
-  <link rel="stylesheet" href="style.css">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
   <style>
@@ -23,9 +21,6 @@
       -ms-user-select: none;
       user-select: none;
     }
-  </style>
-
-  <style>
     body {
       font-family: sans-serif;
       display: flex;
@@ -72,23 +67,69 @@
       justify-content: center;
       background-color: white;
       position: absolute;
+      overflow: hidden; /* 10번: 자식 요소를 위해 추가 */
     }
+    /* 10. 각 카드 슬롯 내 DRAW 버튼 기능 추가 및 가시성 토글을 위한 CSS */
+    .card-slot .draw-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.8);
+      z-index: 10;
+      cursor: pointer;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+      flex-direction: column;
+      gap: 10px;
+      transition: opacity 0.3s ease;
+    }
+    .card-slot .draw-overlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+    .card-slot .draw-overlay button {
+        padding: 10px 20px;
+        font-size: 1.2em;
+        cursor: pointer;
+        background-color: #ff77aa;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: background-color 0.2s, transform 0.2s;
+    }
+    .card-slot .draw-overlay button:hover {
+        background-color: #e66099;
+        transform: translateY(-2px);
+    }
+
     .card-slot img {
       height: 100%;
       width: auto;
       object-fit: contain;
-      transition: opacity 2s ease;
+      /* 7. FLIP 버튼 회전 애니메이션 효과 적용 */
+      transition: opacity 2s ease, transform 0.5s ease;
       opacity: 0;
+      transform: rotate(0deg);
+      position: relative; /* 10번: z-index를 위해 추가 */
+      z-index: 5; /* 10번: 오버레이 아래로 오도록 */
     }
     .card-slot img.visible {
       opacity: 1;
     }
-#slot1 { bottom: 60px; left: 80px; }
-#slot2 { bottom: 140px; left: 250px; }
-#slot3 { bottom: 250px; left: 430px; }
-#slot4 { bottom: 140px; right: 250px; }
-#slot5 { bottom: 60px; right: 80px; }
-
+    /* 카드 위치 정의 (말편자 배열) */
+    #slot1 { bottom: 60px; left: 80px; }
+    #slot2 { bottom: 140px; left: 250px; }
+    #slot3 { bottom: 250px; left: 430px; }
+    #slot4 { bottom: 140px; right: 250px; }
+    #slot5 { bottom: 60px; right: 80px; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
@@ -100,15 +141,47 @@
   <div id="selectors"></div>
 <div class="spread-wrapper">
   <div class="spread">
-    <div class="card-slot" id="slot1"><img id="img1" /></div>
-    <div class="card-slot" id="slot2"><img id="img2" /></div>
-    <div class="card-slot" id="slot3"><img id="img3" /></div>
-    <div class="card-slot" id="slot4"><img id="img4" /></div>
-    <div class="card-slot" id="slot5"><img id="img5" /></div>
+    <div class="card-slot" id="slot1">
+        <div class="draw-overlay" id="drawOverlay1">
+            <span class="position-text">현재 상황</span>
+            <button class="draw-button">DRAW</button>
+        </div>
+        <img id="img1" />
+    </div>
+    <div class="card-slot" id="slot2">
+        <div class="draw-overlay" id="drawOverlay2">
+            <span class="position-text">문제의 쟁점</span>
+            <button class="draw-button">DRAW</button>
+        </div>
+        <img id="img2" />
+    </div>
+    <div class="card-slot" id="slot3">
+        <div class="draw-overlay" id="drawOverlay3">
+            <span class="position-text">문제의 해결책</span>
+            <button class="draw-button">DRAW</button>
+        </div>
+        <img id="img3" />
+    </div>
+    <div class="card-slot" id="slot4">
+        <div class="draw-overlay" id="drawOverlay4">
+            <span class="position-text">가까운 미래</span>
+            <button class="draw-button">DRAW</button>
+        </div>
+        <img id="img4" />
+    </div>
+    <div class="card-slot" id="slot5">
+        <div class="draw-overlay" id="drawOverlay5">
+            <span class="position-text">먼 미래</span>
+            <button class="draw-button">DRAW</button>
+        </div>
+        <img id="img5" />
+    </div>
   </div>
 </div>
+
   <script>
-    const positions = ["현재 상황", "문제의 쟁점", "문제의 해결책", "가까운 미래", "먼 미래"];
+    // 4. JavaScript 전역 변수 및 함수 스코프 관리: 전역 변수 유지
+    const positions = ["현재 상황", "문제의 쟁점", "문제의 해결책", "가까운 미래", "먼 미래"]; // 스프레드 제목에 맞게 변경
     const cardList = [
       ["The Fool","00"],["The Magician","01"],["The High Priestess","02"],["The Empress","03"],
       ["The Emperor","04"],["The Hierophant","05"],["The Lovers","06"],["The Chariot","07"],
@@ -133,45 +206,32 @@
     ];
 
     window.onload = () => {
-      const selectorContainer = document.getElementById('selectors');
-      const selects = [];
+      // 스프레드 카드의 개수를 5개로 조정
+      const numberOfCards = 5; // ✨ 3에서 5로 변경
 
-      positions.forEach((pos, i) => {
+      const selectorContainer = document.getElementById('selectors');
+      const selects = []; // 각 select 요소를 저장할 배열
+
+      for (let i = 0; i < numberOfCards; i++) { // ✨ numberOfCards 사용
         const group = document.createElement('div');
         group.className = 'selector-group';
 
         const select = document.createElement('select');
         const defaultOpt = document.createElement('option');
         defaultOpt.value = '';
-        defaultOpt.text = `${i + 1}. ${pos}`;
+        defaultOpt.text = `${i + 1}. ${positions[i]}`;
         select.appendChild(defaultOpt);
-        cardList.forEach(([name, code]) => {
+        cardList.forEach(([name, code], idx) => {
           const opt = document.createElement('option');
           opt.value = code;
-          opt.text = `${code} ${name}`;
+          // 3. cardList 데이터 활용: 메이저 아르카나만 번호 표시 조건 유지
+          opt.text = idx < 22 ? `${code} ${name}` : name;
           select.appendChild(opt);
-        });
-
-        select.addEventListener('change', function () {
-          const code = this.value;
-          const img = document.getElementById(`img${i + 1}`);
-          if (code) {
-            const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)';
-            img.classList.remove("visible");
-            img.src = `cards/${code}.jpg`;
-            img.style.transform = rot;
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'cover';
-            setTimeout(() => img.classList.add("visible"), 50);
-          } else {
-            img.src = '';
-            img.classList.remove("visible");
-          }
         });
 
         selects.push(select);
 
+        // 10. 원래의 개별 DRAW 버튼 다시 추가
         const rndBtn = document.createElement('button');
         rndBtn.type = 'button';
         rndBtn.textContent = 'DRAW';
@@ -181,7 +241,8 @@
           const avail = cardList.map(c=>c[1]).filter(c=>!used.includes(c));
           if (!avail.length) return;
           const code = avail[Math.floor(Math.random()*avail.length)];
-          select.value = code; select.dispatchEvent(new Event('change'));
+          select.value = code;
+          select.dispatchEvent(new Event('change'));
         });
 
         const flipBtn = document.createElement('button');
@@ -199,7 +260,51 @@
         group.appendChild(rndBtn);
         group.appendChild(flipBtn);
         selectorContainer.appendChild(group);
-      });
+
+        // 10. 각 카드 슬롯의 DRAW 오버레이에 이벤트 리스너 추가 및 가시성 토글
+        const drawOverlay = document.getElementById(`drawOverlay${i + 1}`);
+        
+        if (drawOverlay) { // drawOverlay가 존재할 때만 이벤트 리스너 추가
+            drawOverlay.querySelector('.draw-button').addEventListener('click', () => {
+                const used = selects.map((s,j)=> j===i?null:s.value).filter(v=>v);
+                const avail = cardList.map(c=>c[1]).filter(c=>!used.includes(c));
+                if (!avail.length) return;
+                const code = avail[Math.floor(Math.random()*avail.length)];
+                select.value = code;
+                select.dispatchEvent(new Event('change'));
+            });
+
+            select.addEventListener('change', function () {
+                const code = this.value;
+                const img = document.getElementById(`img${i + 1}`);
+                const overlay = document.getElementById(`drawOverlay${i + 1}`);
+
+                if (code) {
+                    const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)';
+                    img.src = `cards/${code}.jpg`;
+                    
+                    // 7. DRAW 시에는 애니메이션 없이 즉시 회전
+                    img.style.transition = 'opacity 2s ease'; 
+                    img.style.transform = rot;
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+
+                    img.classList.remove('visible');
+                    setTimeout(() => {
+                        img.classList.add('visible');
+                        // 7. FLIP 버튼을 위해 다시 transform transition 추가
+                        img.style.transition = 'opacity 2s ease, transform 0.5s ease'; 
+                    }, 10);
+                    overlay.classList.add('hidden'); // 카드 선택 시 오버레이 숨김
+                } else {
+                    img.src = '';
+                    img.classList.remove('visible');
+                    overlay.classList.remove('hidden'); // 카드 미선택 시 오버레이 다시 표시
+                }
+            });
+        }
+      }
 
       const allGroup = document.createElement('div');
       allGroup.className = 'selector-group';
@@ -210,7 +315,10 @@
       allBtn.addEventListener('click', () => {
         const codes = cardList.map(c=>c[1]);
         const shuffled = codes.sort(()=>Math.random()-0.5);
-        selects.forEach((sel,j)=>{ sel.value=shuffled[j]; sel.dispatchEvent(new Event('change')); });
+        selects.forEach((sel,j)=>{
+          sel.value=shuffled[j];
+          sel.dispatchEvent(new Event('change'));
+        });
       });
       allGroup.appendChild(allBtn);
       selectorContainer.appendChild(allGroup);
@@ -236,9 +344,10 @@
         try {
           const canvas = await html2canvas(element);
           canvas.toBlob((blob) => {
-  autoDownload(blob); // 자동 저장 함수 호출
-  alert('스프레드가 저장되었어요! 😊');
-}, 'image/jpeg');
+            autoDownload(blob);
+            // 5. captureBtn 클릭 시 알림 문구 개선
+            alert('스프레드가 저장되었어요! 😊');
+          }, 'image/jpeg');
 
         } catch (err) {
           console.error(err);
@@ -250,12 +359,10 @@
     };
   </script>
 
-  <!-- 오른쪽 클릭 방지 -->
   <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
   </script>
 
-  <!-- 단축키 방지 -->
   <script>
     document.addEventListener('keydown', function (e) {
       if (
@@ -267,11 +374,14 @@
       }
     });
   </script>
+
 <script>
+// 9. 모바일 다운로드 시 중복 파일 확인창 제거 (고유 파일명 생성)
 function autoDownload(imageBlob) {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(imageBlob);
-  a.download = "tarozon-capture.jpg";
+  const timestamp = new Date().toISOString().replace(/[:.-]/g, '');
+  a.download = `tarozon-capture-${timestamp}.jpg`;
   a.click();
   URL.revokeObjectURL(a.href);
 }
@@ -280,15 +390,15 @@ function autoDownload(imageBlob) {
 
 </html>
 
-  <div id="reading-section" style="margin-top: 40px; max-width: 800px; width: 90%; text-align: center;">
-    <h2>🔮 GPT 리딩 요청 자동 템플릿</h2>
-    <p>다음 칸에 질문을 입력한 뒤, 리딩 요청문을 생성하고 복사해서 ChatGPT에 붙여넣어보세요!</p>
-    <textarea id="userQuestion" placeholder="예: 이 것은 가치 있는 것일까? 내가 본 것이 정보적인 의미가 있을까?" style="width: 100%; height: 140px; padding: 10px; font-size: 14px; margin-bottom: 10px;"></textarea>
-    <br />
-    <button id="generateBtn" onclick="generatePrompt()">리딩 요청문 만들기</button>
-    <button id="copyBtn" onclick="copyPrompt()">📋 복사하기</button>
-    <button id="gptJumpBtn" onclick="goToChatGPT()">🤖 ChatGPT로 이동</button>
-    <button onclick="window.open('contact.html', '_blank')" style="
+<div id="reading-section" style="margin-top: 40px; max-width: 800px; width: 90%; text-align: center;">
+  <h2>🔮 GPT 리딩 요청 자동 템플릿</h2>
+  <p>다음 칸에 질문을 입력한 뒤, 리딩 요청문을 생성하고 복사해서 ChatGPT에 붙여넣어보세요!</p>
+  <textarea id="userQuestion" placeholder="예: 이 것은 가치 있는 것일까? 내가 본 것이 정보적인 의미가 있을까?" style="width: 100%; height: 140px; padding: 10px; font-size: 14px; margin-bottom: 10px;"></textarea>
+  <br />
+  <button id="generateBtn" onclick="generatePrompt()">리딩 요청문 만들기</button>
+  <button id="copyBtn" onclick="copyPrompt()">📋 복사하기</button>
+  <button id="gptJumpBtn" onclick="goToChatGPT()">🤖 ChatGPT로 이동</button>
+  <button onclick="window.open('contact.html', '_blank')" style="
   padding: 5px 10px;
   background-color: #ffc0da;
   color: #6e3b4e;
@@ -306,48 +416,49 @@ onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(
   🌟 실물카드리딩
 </button>
 
-    <pre id="outputArea" style="background:#fff3; padding:1em; white-space:pre-wrap; min-height:120px; font-family:monospace; text-align:left; margin-top: 10px;"></pre>
-  </div>
+  <pre id="outputArea" style="background:#fff3; padding:1em; white-space:pre-wrap; min-height:120px; font-family:monospace; text-align:left; margin-top: 10px;"></pre>
+</div>
 
-  <script>
-    function getCardName(imgId) {
-      const img = document.getElementById(imgId);
-      if (!img || !img.src) return "(선택되지 않음)";
-      const code = img.src.split("/").pop().replace(".jpg", "");
-      const found = cardList.find(([_, c]) => c === code);
-      return found ? found[0] : code;
+<script>
+  // 4. JavaScript 전역 변수 및 함수 스코프 관리: 함수들 전역 스코프 유지
+  function getCardName(imgId) {
+    const img = document.getElementById(imgId);
+    if (!img || !img.src) return "(선택되지 않음)";
+    const code = img.src.split("/").pop().replace(".jpg", "");
+    const found = cardList.find(([_, c]) => c === code);
+    return found ? found[0] : code;
+  }
+
+  function generatePrompt() {
+    const question = document.getElementById("userQuestion").value.trim() || "(질문 내용 없음)";
+    const cardNames = [
+      getCardName("img1"),
+      getCardName("img2"),
+      getCardName("img3"),
+      getCardName("img4"),
+      getCardName("img5") // 5번째 카드 추가
+    ];
+
+    const promptText = `내 질문은 다음과 같아:\n${question}\n\n사용한 카드는 라이더 웨이트 덱이고, 뽑은 카드는 아래와 같아.\n- 현재 상황: ${cardNames[0]}\n- 문제의 쟁점: ${cardNames[1]}\n- 문제의 해결책: ${cardNames[2]}\n- 가까운 미래: ${cardNames[3]}\n- 먼 미래: ${cardNames[4]}\n\n이 카드들을 바탕으로 전체적인 메시지를 구조적으로 정리해서 설명해줘.`;
+
+    document.getElementById("outputArea").textContent = promptText;
+  }
+
+  function copyPrompt() {
+    const text = document.getElementById("outputArea").textContent;
+    navigator.clipboard.writeText(text).then(() => alert("복사되었어요! GPT에 붙여넣기 하세요 ✨"));
+  }
+
+  function goToChatGPT() {
+    const text = document.getElementById("outputArea").textContent;
+    if (!text.trim()) {
+      alert("먼저 리딩 요청문을 생성해 주세요!");
+      return;
     }
-
-    function generatePrompt() {
-      const question = document.getElementById("userQuestion").value.trim() || "(질문 내용 없음)";
-      const cardNames = [
-        getCardName("img1"),
-        getCardName("img2"),
-        getCardName("img3"),
-        getCardName("img4"),
-        getCardName("img5")
-      ];
-
-      const promptText = `내 질문은 다음과 같아:\n${question}\n\n사용한 카드는 라이더 웨이트 덱이고, 뽑은 카드는 아래와 같아.\n- 현재 상황: ${cardNames[0]}\n- 문제의 쟁점: ${cardNames[1]}\n- 문제의 해결책: ${cardNames[2]}\n- 가까운 미래: ${cardNames[3]}\n- 먼 미래: ${cardNames[4]}\n\n이 카드들을 바탕으로 전체적인 메시지를 구조적으로 정리해서 설명해줘.`;
-
-      document.getElementById("outputArea").textContent = promptText;
-    }
-
-    function copyPrompt() {
-      const text = document.getElementById("outputArea").textContent;
-      navigator.clipboard.writeText(text).then(() => alert("복사되었어요! GPT에 붙여넣기 하세요 ✨"));
-    }
-
-    function goToChatGPT() {
-      const text = document.getElementById("outputArea").textContent;
-      if (!text.trim()) {
-        alert("먼저 리딩 요청문을 생성해 주세요!");
-        return;
-      }
-      navigator.clipboard.writeText(text).then(() => {
-        window.open("https://chat.openai.com", "_blank");
-      });
-    }
-  </script>
-</body>
-</html>
+    // 6. goToChatGPT 함수에 복사 성공 알림 추가
+    navigator.clipboard.writeText(text).then(() => {
+      alert("리딩 요청문이 복사되었습니다. ChatGPT로 이동합니다.");
+      window.open("https://chat.openai.com", "_blank");
+    });
+  }
+</script>
