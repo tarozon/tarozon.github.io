@@ -223,3 +223,41 @@ footer {
     padding: 6px 10px;
   }
 }
+
+/* 소셜 아이콘 링크 블럭 (가운데 정렬) */
+.social-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin: 40px 0;
+  flex-wrap: wrap;
+}
+
+/* 각 아이콘 버튼 */
+.social-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #fff;
+  border: 1px solid #eee;
+  border-radius: 9999px;
+  font-size: 14px;
+  color: #333;
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.social-links a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 아이콘 이미지 통일 */
+.social-links img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
