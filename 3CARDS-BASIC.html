@@ -304,67 +304,90 @@
       shGroup.appendChild(shBtn);
       selectorContainer.appendChild(shGroup);
 
-// 캡처 버튼 추가 (selector-group 안에)
-const capGroup = document.createElement('div');
-capGroup.className = 'selector-group';
+      const capGroup = document.createElement('div');
+      capGroup.className = 'selector-group';
+      const capBtn = document.createElement('button');
+      capBtn.id = 'captureBtn';
+      capBtn.textContent = 'CAPTURE';
+      capBtn.className = 'random-btn';
+      capBtn.addEventListener('click', async () => {
+        const element = document.querySelector('.spread');
+        try {
+          const canvas = await html2canvas(element);
+          canvas.toBlob((blob) => {
+            autoDownload(blob);
+            alert('스프레드가 저장되었어요! 😊');
+          }, 'image/jpeg');
 
-const capBtn = document.createElement('button');
-capBtn.id = 'captureBtn';
-capBtn.textContent = 'CAPTURE';
-capBtn.className = 'random-btn';
-
-capBtn.addEventListener('click', async () => {
-  const element = document.querySelector('.spread');
-  if (!element) {
-    alert('캡처할 대상(.spread)이 없어요!');
-    return;
-  }
-
-  try {
-    // 1. html2canvas로 원본 캡처
-    const originalCanvas = await html2canvas(element, { useCORS: true });
-
-    // 2. 새 캔버스에 복사
-    const watermarkCanvas = document.createElement('canvas');
-    watermarkCanvas.width = originalCanvas.width;
-    watermarkCanvas.height = originalCanvas.height;
-    const ctx = watermarkCanvas.getContext('2d');
-
-    ctx.drawImage(originalCanvas, 0, 0);
-
-    // 3. 워터마크 추가
-    ctx.font = '18px sans-serif';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'bottom';
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
-    ctx.lineWidth = 2;
-    ctx.strokeText('TAROZON', watermarkCanvas.width - 10, watermarkCanvas.height - 10);
-    ctx.fillText('TAROZON', watermarkCanvas.width - 10, watermarkCanvas.height - 10);
-
-    // 4. 다운로드
-    watermarkCanvas.toBlob((blob) => {
-      if (!blob) {
-        alert('블롭 변환 실패!');
-        return;
-      }
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'tarozon_capture.jpg';
-      a.click();
-    }, 'image/jpeg');
-  } catch (err) {
-    console.error(err);
-    alert('캡처에 실패했어요... 콘솔을 확인해 주세요.');
-  }
-});
-
-capGroup.appendChild(capBtn);
-document.getElementById('selectors').appendChild(capGroup);
-
+        } catch (err) {
+          console.error(err);
+          alert('캡처에 실패했어요… 콘솔을 확인해 주세요.');
+        }
+      });
+      capGroup.appendChild(capBtn);
+      selectorContainer.appendChild(capGroup);
+    };
   </script>
 
   <script>
+    document.addEventListener('contextmenu', event => event.preventDefault());
+  </script>
+
+  <script>
+    document.addEventListener('keydown', function (e) {
+      if (
+        e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'c') ||
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && e.key === 'I')
+      ) {
+        e.preventDefault();
+      }
+    });
+  </script>
+  <script>
+    function autoDownload(imageBlob) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(imageBlob);
+      const timestamp = new Date().toISOString().replace(/[:.-]/g, '');
+      a.download = `tarozon-capture-${timestamp}.jpg`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+  </script>
+</body>
+
+</html>
+
+<div id="reading-section" style="margin-top: 40px; max-width: 800px; width: 90%; text-align: center;">
+  <h2>🔮 GPT 리딩 요청 자동 템플릿</h2>
+  <p>아래 칸에 질문을 입력한 뒤, 리딩 요청문을 생성하고 복사해서 ChatGPT에 붙여넣어보세요!</p>
+  <textarea id="userQuestion" placeholder="예: 상대방은 날 어떻게 생각할까? 우리 관계는 어떻게 될까?" style="width: 100%; height: 140px; padding: 10px; font-size: 14px; margin-bottom: 10px;"></textarea>
+  <br />
+  <button id="generateBtn" onclick="generatePrompt()">리딩 요청문 만들기</button>
+  <button id="copyBtn" onclick="copyPrompt()">📋 복사하기</button>
+  <button id="gptJumpBtn" onclick="goToChatGPT()">🤖 ChatGPT로 이동</button>
+  <button onclick="window.open('http://pf.kakao.com/_NgxjJn', '_blank')" style="
+  padding: 5px 10px;
+  background-color: #ffc0da;
+  color: #6e3b4e;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1.5px solid #f9c46b;
+  cursor: pointer;
+  margin-left: 8px;
+  box-shadow: 0 0 6px rgba(255, 179, 218, 0.6), 0 0 4px rgba(249, 196, 107, 0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+"
+onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 10px rgba(255, 179, 218, 0.8), 0 0 6px rgba(249, 196, 107, 0.7)'"
+onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(255, 179, 218, 0.6), 0 0 4px rgba(249, 196, 107, 0.5)'"
+>
+  🌟 타로존 카카오 채널
+</button>
+
+  <pre id="outputArea" style="background:#fff3; padding:1em; white-space:pre-wrap; min-height:120px; font-family:monospace; text-align:left; margin-top: 10px;"></pre>
+</div>
+
+<script>
   function getCardName(imgId) {
     const img = document.getElementById(imgId);
     if (!img || !img.src) return "(선택되지 않음)";
@@ -403,34 +426,3 @@ document.getElementById('selectors').appendChild(capGroup);
     });
   }
 </script>
-
-  <div id="reading-section" style="margin-top: 40px; max-width: 800px; width: 90%; text-align: center;">
-  <h2>🔮 GPT 리딩 요청 자동 템플릿</h2>
-  <p>아래 칸에 질문을 입력한 뒤, 리딩 요청문을 생성하고 복사해서 ChatGPT에 붙여넣어보세요!</p>
-  <textarea id="userQuestion" placeholder="예: 상대방은 날 어떻게 생각할까? 우리 관계는 어떻게 될까?" style="width: 100%; height: 140px; padding: 10px; font-size: 14px; margin-bottom: 10px;"></textarea>
-  <br />
-  <button id="generateBtn" onclick="generatePrompt()">리딩 요청문 만들기</button>
-  <button id="copyBtn" onclick="copyPrompt()">📋 복사하기</button>
-  <button id="gptJumpBtn" onclick="goToChatGPT()">🤖 ChatGPT로 이동</button>
-  <button onclick="window.open('http://pf.kakao.com/_NgxjJn', '_blank')" style="
-  padding: 5px 10px;
-  background-color: #ffc0da;
-  color: #6e3b4e;
-  font-weight: 500;
-  border-radius: 6px;
-  border: 1.5px solid #f9c46b;
-  cursor: pointer;
-  margin-left: 8px;
-  box-shadow: 0 0 6px rgba(255, 179, 218, 0.6), 0 0 4px rgba(249, 196, 107, 0.5);
-  transition: transform 0.2s, box-shadow 0.2s;
-"
-onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 10px rgba(255, 179, 218, 0.8), 0 0 6px rgba(249, 196, 107, 0.7)'"
-onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(255, 179, 218, 0.6), 0 0 4px rgba(249, 196, 107, 0.5)'"
->
-  🌟 타로존 카카오 채널
-</button>
-
-  <pre id="outputArea" style="background:#fff3; padding:1em; white-space:pre-wrap; min-height:120px; font-family:monospace; text-align:left; margin-top: 10px;"></pre>
-</div>
-</body>
-</html>
