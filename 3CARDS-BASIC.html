@@ -314,6 +314,15 @@
         const element = document.querySelector('.spread');
         try {
           const canvas = await html2canvas(element);
+          const ctx = canvas.getContext('2d');
+          ctx.font = '18px 산세리프';
+          ctx.textAlign = '오른쪽';
+          ctx.textBaseline = '하단';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+          ctx.strokeStyle = 'rgba(0, 0, 0, 0.6)';
+          ctx.선폭 = 3;
+          ctx.strokeText('타로존', 캔버스.너비 - 10, 캔버스.높이 - 10);
+          ctx.fillText('타로존', 캔버스.너비 - 10, 캔버스.높이 - 10);
           canvas.toBlob((blob) => {
             autoDownload(blob);
             alert('스프레드가 저장되었어요! 😊');
