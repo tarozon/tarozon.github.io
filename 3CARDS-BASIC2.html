@@ -16,206 +16,189 @@
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
   <style>
-  * {
-    box-sizing: border-box;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-
-  body {
-    font-family: sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #fdf6e3;
-    padding: 20px;
-    margin: 0;
-  }
-
-  h1 {
-    margin-top: 20px;
-  }
-
-  #selectors {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .selector-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-  }
-
-  select, .random-btn, #allRandomBtn, #shuffleBtn, #captureBtn {
-    padding: 6px 12px;
-    font-size: 14px;
-    cursor: pointer;
-  }
-
-  select {
-    width: 160px;
-  }
-
-  .spread-wrapper {
-    width: 100%;
-    max-width: 1000px;
-    padding: 0;
-  }
-
-  .spread {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    aspect-ratio: 3 / 2; /* 핵심!! 카드 3개가 들어갈 비율 */
-    margin-top: 20px;
-  }
-
-  .card-slot {
-    width: 32%; /* 3장 + 간격 약간 확보 */
-    height: 100%;
-    border: none;
-    background-color: transparent;
-    perspective: 1000px;
-    flex-shrink: 0;
-  }
-
-  .flip-card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transition: transform 0.8s;
-    transform-style: preserve-3d;
-  }
-
-  .card-slot.is-flipped .flip-card-inner {
-    transform: rotateY(180deg);
-  }
-
-  .flip-card-front, .flip-card-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  }
-
-  .flip-card-front {
-    transform: rotateY(180deg);
-  }
-
-  .flip-card-back {
-    background-color: #fff;
-  }
-
-  .card-back-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .card-slot img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 1;
-    transform: rotate(0deg);
-    position: static;
-    z-index: auto;
-  }
-
-  .draw-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(0, 0, 0, 0.3);
-    z-index: 10;
-    cursor: pointer;
-    font-size: 1.5em;
-    font-weight: bold;
-    color: white;
-    text-shadow: 1px 1px 3px black;
-    text-align: center;
-    flex-direction: column;
-    gap: 10px;
-    opacity: 1;
-    transition: opacity 0.5s;
-    overflow: hidden;
-  }
-
-  .card-slot.is-flipped .draw-overlay {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .draw-overlay .draw-button {
-    padding: 10px 20px;
-    font-size: 1.2em;
-    cursor: pointer;
-    background-color: #ff77aa;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: background-color 0.2s, transform 0.2s;
-    max-width: 90%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .draw-overlay .draw-button:hover {
-    background-color: #e66099;
-    transform: translateY(-2px);
-  }
-
-  /* 모바일 대응 */
-  @media (max-width: 768px) {
-    .spread {
-      aspect-ratio: 3 / 4; /* 세로형 화면 비율에서 카드 전체 살리기 */
+    /* 이 한 줄이 모든 문제의 해결책입니다 */
+    * {
+      box-sizing: border-box; 
     }
+
+    *, *::before, *::after {
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    body {
+      /* ✨✨✨ 바로 이 부분입니다! 브라우저 기본 마진 제거 ✨✨✨ */
+      margin: 0;
+
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #fdf6e3;
+      padding: 20px;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+    #selectors {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .selector-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    select, .random-btn, #allRandomBtn, #shuffleBtn, #captureBtn {
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    select {
+      width: 160px;
+    }
+
+    /* --- 1. 레이아웃 컨테이너 설정 --- */
+    .spread-wrapper {
+        width: 100%;
+        padding: 0 10px;
+    }
+    .spread {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 4%;
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    /* --- 2. 카드 슬롯을 반응형으로 변경 --- */
     .card-slot {
       width: 30%;
+      max-width: 144px;
+      aspect-ratio: 144 / 252;
+      border: none;
+      background-color: transparent;
+      perspective: 1000px;
     }
 
+    /* --- 3. 카드 뒤집기 및 내부 UI 스타일 --- */
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+    .card-slot.is-flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .flip-card-front {
+      transform: rotateY(180deg);
+    }
+    .flip-card-back {
+      background-color: #fff;
+    }
+    .card-back-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
     .draw-overlay {
-      font-size: 4vw;
-      gap: 5px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.3);
+      z-index: 10;
+      cursor: pointer;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 3px black;
+      text-align: center;
+      flex-direction: column;
+      gap: 10px;
+      opacity: 1;
+      transition: opacity 0.5s;
+      overflow: hidden;
     }
-
+    .card-slot.is-flipped .draw-overlay {
+        opacity: 0;
+        pointer-events: none;
+    }
     .draw-overlay .draw-button {
-      font-size: 3.5vw;
-      padding: 8px 10px;
-      border-radius: 6px;
+        padding: 10px 20px;
+        font-size: 1.2em;
+        cursor: pointer;
+        background-color: #ff77aa;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: background-color 0.2s, transform 0.2s;
+        max-width: 90%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-  }
+    .draw-overlay .draw-button:hover {
+        background-color: #e66099;
+        transform: translateY(-2px);
+    }
 
-  @media (max-width: 400px) {
-    .draw-overlay {
-      font-size: 12px;
+    .card-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 1;
+      transform: rotate(0deg);
+      position: static;
+      z-index: auto;
     }
 
-    .draw-overlay .draw-button {
-      font-size: 11px;
-      padding: 5px 8px;
+    /* --- 4. 모바일 반응형 폰트 크기 조절 --- */
+    @media (max-width: 768px) {
+      .draw-overlay {
+        font-size: 4vw;
+        gap: 5px;
+      }
+
+      .draw-overlay .draw-button {
+        font-size: 3.5vw;
+        padding: 8px 10px;
+        border-radius: 6px;
+      }
     }
-  }
+    @media (max-width: 400px) {
+      .draw-overlay {
+        font-size: 12px;
+      }
+      .draw-overlay .draw-button {
+        font-size: 11px;
+        padding: 5px 8px;
+      }
+    }
 </style>
-
 
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
