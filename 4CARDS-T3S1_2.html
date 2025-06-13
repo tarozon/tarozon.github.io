@@ -55,31 +55,30 @@
     }
     .spread-wrapper {
       width: 100%;
-      max-width: 800px; /* 4카드이므로 최대 너비를 조금 늘림 */
+      max-width: 800px;
     }
     
-    /* [수정 1] 카드 크기 및 간격 문제 해결 */
+    /* [수정 1] 카드 크기 및 배열 문제 해결 */
     .spread {
       display: flex;
       justify-content: center;
-      flex-wrap: wrap; /* 카드가 4개이므로 화면이 작아지면 줄바꿈 허용 */
-      gap: 2vw; /* 화면 너비에 따라 간격 유연하게 조절 */
+      /* flex-wrap을 제거하여 절대 줄바꿈이 일어나지 않도록 함 */
+      gap: 1.5vw; /* 4카드에 맞게 간격을 조금 줄임 */
       margin-top: 20px;
       width: 100%;
     }
     .card-slot {
-      /* 4개 카드가 한 줄에 들어오도록 너비 조정 (22% * 4 = 88%) */
+      /* 4개의 카드가 한 줄에 들어오도록 너비 재계산 (22% * 4 + 간격) */
       width: 22%; 
-      max-width: 144px; /* 카드가 너무 커지지 않게 제한 */
-      height: auto; /* 높이는 자동으로 조절 */
-      aspect-ratio: 144 / 252; /* 원래 카드 비율 유지 */
+      max-width: 144px;
+      height: auto;
+      aspect-ratio: 144 / 252;
       
       border: none;
       background-color: transparent;
       perspective: 1000px;
-      margin-bottom: 20px; /* 줄바꿈 시 아래 카드와의 간격 */
     }
-    /* --- 카드 뒤집기 기능 CSS 원본 유지 --- */
+    
     .flip-card-inner {
       position: relative;
       width: 100%;
@@ -124,7 +123,7 @@
       background-color: rgba(0, 0, 0, 0.3);
       z-index: 10;
       cursor: pointer;
-      font-size: 1.5em;
+      font-size: 1.2em; /* 4카드이므로 폰트를 살짝 줄임 */
       font-weight: bold;
       color: white;
       text-shadow: 1px 1px 3px black;
@@ -139,8 +138,8 @@
         pointer-events: none;
     }
     .draw-overlay .draw-button {
-        padding: 10px 20px;
-        font-size: 1.2em;
+        padding: 8px 16px; /* 4카드이므로 버튼을 살짝 줄임 */
+        font-size: 1em;
         cursor: pointer;
         background-color: #ff77aa;
         color: white;
@@ -164,12 +163,8 @@
       z-index: auto;
     }
     
-    @media only screen and (max-width: 768px) {
-      .card-slot {
-        /* 모바일에서는 한 줄에 2개씩 보이도록 너비 조정 */
-        width: 45%; 
-      }
-    }
+    /* 문제가 되었던 모바일 강제 줄바꿈 코드를 완전히 제거 */
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
@@ -337,11 +332,10 @@
             const cardSlot = document.getElementById(`cardSlot${i + 1}`);
 
             if (code && cardSlot) {
-                // 이미지 회전(정/역)과 카드 뒤집기(앞/뒤)를 분리
                 const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)';
                 img.src = `/cards/${code}.jpg`;
-                img.style.transform = rot; // 이미지 자체의 정/역방향 설정
-                cardSlot.classList.add('is-flipped'); // 카드를 뒤집는 CSS 클래스 추가
+                img.style.transform = rot;
+                cardSlot.classList.add('is-flipped');
             } else if (cardSlot) {
                 img.src = '';
                 cardSlot.classList.remove('is-flipped');
