@@ -30,6 +30,7 @@
     align-items: center;
     background-color: #fdf6e3;
     padding: 20px;
+    margin: 0;
   }
 
   h1 {
@@ -61,30 +62,27 @@
     width: 160px;
   }
 
-  /* 📌 카드 컨테이너 */
+  /* 📌 핵심: 한 줄 3장, 스크롤 없이 */
   .spread-wrapper {
     width: 100%;
-    overflow-x: auto;
-    padding: 0;
+    max-width: 1000px;
+    margin-top: 20px;
+    padding: 0 5%;
   }
 
   .spread {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 16px;
-    width: max-content;
-    margin-top: 20px;
+    width: 100%;
   }
 
   .card-slot {
-    width: calc((100vw - 64px) / 3);
-    max-width: 144px;
+    width: 30%; /* 3장 = 90%, 나머지 10%는 여백으로 분산 */
     aspect-ratio: 144 / 252;
     border: none;
     background-color: transparent;
     perspective: 1000px;
-    flex-shrink: 0;
   }
 
   .flip-card-inner {
@@ -184,11 +182,10 @@
     transform: translateY(-2px);
   }
 
-  /* 모바일 대응 */
+  /* 📱 모바일 대응 */
   @media (max-width: 768px) {
     .card-slot {
       width: 30%;
-      max-width: none;
     }
 
     .draw-overlay {
@@ -214,6 +211,7 @@
     }
   }
 </style>
+
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
