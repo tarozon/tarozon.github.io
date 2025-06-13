@@ -1,494 +1,539 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#ff77aa" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="TAROZON" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+ <!DOCTYPE html> 
+ <html lang="ko"> 
+ <head> 
+  <link rel="manifest" href="/manifest.json" /> 
+  <meta name="theme-color" content="#ff77aa" /> 
+  <meta name="apple-mobile-web-app-capable" content="yes" /> 
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" /> 
+  <meta name="apple-mobile-web-app-title" content="TAROZON" /> 
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" /> 
 
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>·말편자 배열법</title>
-  <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="/mobile.css" media="only screen and (max-width: 768px)">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <meta charset="UTF-8" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+  <title>·말편자 배열법</title> 
+  <link rel="stylesheet" href="/style.css"> 
+  <link rel="stylesheet" href="/mobile.css" media="only screen and (max-width: 768px)"> 
+  <link rel="icon" href="/favicon.ico" type="image/x-icon"> 
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-  <style>
-    * {
-      -webkit-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-    body {
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-color: #fdf6e3;
-      padding: 20px;
-    }
-    h1 {
-      margin-top: 20px;
-    }
-    #selectors {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .selector-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-    select, .random-btn, #allRandomBtn, #shuffleBtn, #captureBtn {
-      padding: 6px 12px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    select {
-      width: 160px;
-    }
-    .spread-wrapper {
-        width: 100%;
-        max-width: 1000px; /* 최대 너비 고정 */
-        display: flex;
-        justify-content: center;
-    }
-    .spread {
-      position: relative;
-      width: 100%; /* 부모 요소에 맞춰짐 */
-      max-width: 1000px;
-      height: 600px;
-    }
-    .card-slot {
-      width: 14.4%; /* 고정 픽셀에서 %로 변경하여 반응형 대응 */
-      height: 42%; /* 252px / 600px */
-      /* width: 144px; */
-      /* height: 252px; */
-      border: none; /* 뒷면 이미지가 테두리 역할을 하므로 제거 */
-      background-color: transparent;
-      position: absolute;
-      perspective: 1000px; /* 3D 효과를 위한 원근감 */
-    }
-    .card-inner {
+  <style> 
+    * { 
+       -webkit-user-select: none; 
+       -ms-user-select: none; 
+       user-select: none; 
+     } 
+     body { 
+       font-family: sans-serif; 
+       display: flex; 
+       flex-direction: column; 
+       align-items: center; 
+       background-color: #fdf6e3; 
+       padding: 20px; 
+     } 
+     h1 { 
+       margin-top: 20px; 
+     } 
+     #selectors { 
+       display: flex; 
+       gap: 10px; 
+       margin-bottom: 20px; 
+       flex-wrap: wrap; 
+       justify-content: center; 
+     } 
+     .selector-group { 
+       display: flex; 
+       flex-direction: column; 
+       align-items: center; 
+       gap: 4px; 
+     } 
+     select, .random-btn, #allRandomBtn, #shuffleBtn, #captureBtn { 
+       padding: 6px 12px; 
+       font-size: 14px; 
+       cursor: pointer; 
+     } 
+     select { 
+       width: 160px; 
+     } 
+     .spread { 
+       position: relative; 
+       width: 1000px; 
+       height: 600px; 
+     } 
+     .card-slot { 
+       width: 144px; 
+       height: 252px; 
+       border: 1px solid #ccc; 
+       background-color: white; 
+       position: absolute; 
+       /* 카드 뒤집기 애니메이션을 위한 3D 공간 설정 */
+       perspective: 1000px;
+     } 
+     /* 카드 뒤집기를 위한 스타일 추가 */
+    .card-flipper {
         position: relative;
         width: 100%;
         height: 100%;
-        transition: transform 0.8s;
+        transition: transform 0.6s;
         transform-style: preserve-3d;
     }
-    .card-slot.is-flipped .card-inner {
+    .card-slot.flipped .card-flipper {
         transform: rotateY(180deg);
     }
     .card-face {
         position: absolute;
         width: 100%;
         height: 100%;
-        -webkit-backface-visibility: hidden; /* Safari */
+        -webkit-backface-visibility: hidden;
         backface-visibility: hidden;
-        object-fit: cover;
-        border-radius: 8px; /* 카드 모서리 둥글게 */
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 8px; /* 카드 모서리를 둥글게 */
     }
     .card-front {
         transform: rotateY(180deg);
     }
-    .card-slot .draw-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      cursor: pointer;
-      font-size: 1.5em;
-      font-weight: bold;
-      color: #333;
-      text-align: center;
-      flex-direction: column;
-      gap: 10px;
-      transition: opacity 0.3s ease;
-      background-color: rgba(255, 255, 255, 0); /* 초기에는 투명하게 */
+    .card-back img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
-    .card-slot .draw-overlay.hidden {
-        opacity: 0;
-        pointer-events: none;
-    }
-    .card-slot .draw-overlay button {
-        padding: 10px 20px;
-        font-size: 1.2em;
-        cursor: pointer;
-        background-color: #ff77aa;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: background-color 0.2s, transform 0.2s;
-    }
-    .card-slot .draw-overlay button:hover {
-        background-color: #e66099;
-        transform: translateY(-2px);
-    }
-    /* 카드 위치 정의 (말편자 배열) - % 기반으로 재조정 */
-    #slot1 { bottom: 10%; left: 8%; }  /* 60px / 600px, 80px / 1000px */
-    #slot2 { bottom: 23.3%; left: 25%; } /* 140px / 600px, 250px / 1000px */
-    #slot3 { bottom: 41.6%; left: 42.8%; } /* 250px / 600px, 430px / 1000px -> 중앙 정렬 위해 조정 */
-    #slot4 { bottom: 23.3%; right: 25%; }
-    #slot5 { bottom: 10%; right: 8%; }
 
-    /* 모바일 뷰에서는 카드 크기와 위치를 다르게 조정 */
-    @media (max-width: 768px) {
-        .spread {
-            height: 80vh; /* 모바일 화면 높이에 맞춤 */
-        }
-        .card-slot {
-            width: 28%; /* 모바일에서 카드 너비 키움 */
-            height: 30%; /* 모바일에서 카드 높이 조정 */
-        }
-        /* 모바일용 위치 재조정 */
-        #slot1 { bottom: 5%; left: 5%; }
-        #slot2 { bottom: 35%; left: 15%; }
-        #slot3 { top: 5%; left: 50%; transform: translateX(-50%); } /* 중앙 상단 */
-        #slot4 { bottom: 35%; right: 15%; }
-        #slot5 { bottom: 5%; right: 5%; }
-    }
-  </style>
-</head>
-<body>
-  <a href="/" class="home-button">🏠 홈</a>
-  <a href="http://pf.kakao.com/_NgxjJn/chat" class="reading-button">1:1 채팅 상담</a>
+     .card-slot .draw-overlay { 
+       position: absolute; 
+       top: 0; 
+       left: 0; 
+       width: 100%; 
+       height: 100%; 
+       display: flex; 
+       align-items: center; 
+       justify-content: center; 
+       background-color: rgba(255, 255, 255, 0.8); 
+       z-index: 10; 
+       cursor: pointer; 
+       font-size: 1.5em; 
+       font-weight: bold; 
+       color: #333; 
+       text-align: center; 
+       flex-direction: column; 
+       gap: 10px; 
+       transition: opacity 0.3s ease; 
+     } 
+     .card-slot .draw-overlay.hidden { 
+         opacity: 0; 
+         pointer-events: none; 
+     } 
+     .card-slot .draw-overlay button { 
+         padding: 10px 20px; 
+         font-size: 1.2em; 
+         cursor: pointer; 
+         background-color: #ff77aa; 
+         color: white; 
+         border: none; 
+         border-radius: 8px; 
+         box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+         transition: background-color 0.2s, transform 0.2s; 
+     } 
+     .card-slot .draw-overlay button:hover { 
+         background-color: #e66099; 
+         transform: translateY(-2px); 
+     } 
+     .card-slot img { 
+       height: 100%; 
+       width: auto; 
+       object-fit: contain; 
+       transition: opacity 2s ease, transform 0.5s ease; 
+       opacity: 0; 
+       transform: rotate(0deg); 
+       z-index: 5; 
+     } 
+     .card-slot img.visible { 
+       opacity: 1; 
+     } 
+     /* 카드 위치 정의 (말편자 배열) */ 
+     #slot1 { bottom: 60px; left: 80px; } 
+     #slot2 { bottom: 140px; left: 250px; } 
+     #slot3 { bottom: 250px; left: 430px; } 
+     #slot4 { bottom: 140px; right: 250px; } 
+     #slot5 { bottom: 60px; right: 80px; } 
+   </style> 
+ </head> 
+ <body> 
+  <a href="/" class="home-button">🏠 홈</a> 
+  <a href="http://pf.kakao.com/_NgxjJn/chat" class="reading-button">1:1 채팅 상담</a> 
 
-  <h1>🐎 말편자 배열법 5카드 스프레드 🐎</h1>
-  <div id="selectors"></div>
+  <h1>🐎 말편자 배열법 5카드 스프레드 🐎</h1> 
+  <div id="selectors"></div> 
 
-<div class="spread-wrapper">
-  <div class="spread">
-    <div class="card-slot" id="slot1">
-        <div class="card-inner">
-            <img class="card-face card-back" src="cards/card-back.jpg" alt="Card Back">
-            <img id="img1" class="card-face card-front" />
-        </div>
-        <div class="draw-overlay" id="drawOverlay1">
-            <span class="position-text">현재 상황</span>
-            <button class="draw-button">DRAW</button>
-        </div>
-    </div>
-    <div class="card-slot" id="slot2">
-        <div class="card-inner">
-            <img class="card-face card-back" src="cards/card-back.jpg" alt="Card Back">
-            <img id="img2" class="card-face card-front" />
-        </div>
-        <div class="draw-overlay" id="drawOverlay2">
-            <span class="position-text">문제의 쟁점</span>
-            <button class="draw-button">DRAW</button>
-        </div>
-    </div>
-    <div class="card-slot" id="slot3">
-        <div class="card-inner">
-            <img class="card-face card-back" src="cards/card-back.jpg" alt="Card Back">
-            <img id="img3" class="card-face card-front" />
-        </div>
-        <div class="draw-overlay" id="drawOverlay3">
-            <span class="position-text">문제의 해결책</span>
-            <button class="draw-button">DRAW</button>
-        </div>
-    </div>
-    <div class="card-slot" id="slot4">
-        <div class="card-inner">
-            <img class="card-face card-back" src="cards/card-back.jpg" alt="Card Back">
-            <img id="img4" class="card-face card-front" />
-        </div>
-        <div class="draw-overlay" id="drawOverlay4">
-            <span class="position-text">가까운 미래</span>
-            <button class="draw-button">DRAW</button>
-        </div>
-    </div>
-    <div class="card-slot" id="slot5">
-        <div class="card-inner">
-            <img class="card-face card-back" src="cards/card-back.jpg" alt="Card Back">
-            <img id="img5" class="card-face card-front" />
-        </div>
-        <div class="draw-overlay" id="drawOverlay5">
-            <span class="position-text">먼 미래</span>
-            <button class="draw-button">DRAW</button>
-        </div>
-    </div>
-  </div>
-</div>
+  <div class="spread-wrapper"> 
+  <div class="spread"> 
+      <!-- 카드 뒤집기를 위해 HTML 구조 변경 -->
+      <div class="card-slot" id="slot1">
+          <div class="card-flipper">
+              <div class="card-face card-front">
+                  <img id="img1" />
+              </div>
+              <div class="card-face card-back">
+                  <img src="cards/card-back.jpg" alt="Card Back">
+              </div>
+          </div>
+          <div class="draw-overlay" id="drawOverlay1">
+              <span class="position-text">현재 상황</span>
+              <button class="draw-button">DRAW</button>
+          </div>
+      </div>
+      <div class="card-slot" id="slot2">
+          <div class="card-flipper">
+              <div class="card-face card-front">
+                  <img id="img2" />
+              </div>
+              <div class="card-face card-back">
+                  <img src="cards/card-back.jpg" alt="Card Back">
+              </div>
+          </div>
+          <div class="draw-overlay" id="drawOverlay2">
+              <span class="position-text">문제의 쟁점</span>
+              <button class="draw-button">DRAW</button>
+          </div>
+      </div>
+      <div class="card-slot" id="slot3">
+          <div class="card-flipper">
+              <div class="card-face card-front">
+                  <img id="img3" />
+              </div>
+              <div class="card-face card-back">
+                  <img src="cards/card-back.jpg" alt="Card Back">
+              </div>
+          </div>
+          <div class="draw-overlay" id="drawOverlay3">
+              <span class="position-text">문제의 해결책</span>
+              <button class="draw-button">DRAW</button>
+          </div>
+      </div>
+      <div class="card-slot" id="slot4">
+          <div class="card-flipper">
+              <div class="card-face card-front">
+                  <img id="img4" />
+              </div>
+              <div class="card-face card-back">
+                  <img src="cards/card-back.jpg" alt="Card Back">
+              </div>
+          </div>
+          <div class="draw-overlay" id="drawOverlay4">
+              <span class="position-text">가까운 미래</span>
+              <button class="draw-button">DRAW</button>
+          </div>
+      </div>
+      <div class="card-slot" id="slot5">
+          <div class="card-flipper">
+              <div class="card-face card-front">
+                  <img id="img5" />
+              </div>
+              <div class="card-face card-back">
+                  <img src="cards/card-back.jpg" alt="Card Back">
+              </div>
+          </div>
+          <div class="draw-overlay" id="drawOverlay5">
+              <span class="position-text">먼 미래</span>
+              <button class="draw-button">DRAW</button>
+          </div>
+      </div>
+  </div> 
+  </div> 
 
-  <script>
+  <script> 
     const positions = ["현재 상황", "문제의 쟁점", "문제의 해결책", "가까운 미래", "먼 미래"];
-    const cardList = [
-      ["The Fool","00"],["The Magician","01"],["The High Priestess","02"],["The Empress","03"],
-      ["The Emperor","04"],["The Hierophant","05"],["The Lovers","06"],["The Chariot","07"],
-      ["Strength","08"],["The Hermit","09"],["The Wheel of Fortune","10"],["Justice","11"],
-      ["The Hanged Man","12"],["Death","13"],["Temperance","14"],["The Devil","15"],
-      ["The Tower","16"],["The Star","17"],["The Moon","18"],["The Sun","19"],
-      ["Judgement","20"],["The World","21"],["King of Pentacles","22"],["Queen of Pentacles","23"],
-      ["Knight of Pentacles","24"],["Page of Pentacles","25"],["Ace of Pentacles","26"],["Two of Pentacles","27"],
-      ["Three of Pentacles","28"],["Four of Pentacles","29"],["Five of Pentacles","30"],["Six of Pentacles","31"],
-      ["Seven of Pentacles","32"],["Eight of Pentacles","33"],["Nine of Pentacles","34"],["Ten of Pentacles","35"],
-      ["King of Cups","36"],["Queen of Cups","37"],["Knight of Cups","38"],["Page of Cups","39"],
-      ["Ace of Cups","40"],["Two of Cups","41"],["Three of Cups","42"],["Four of Cups","43"],
-      ["Five of Cups","44"],["Six of Cups","45"],["Seven of Cups","46"],["Eight of Cups","47"],
-      ["Nine of Cups","48"],["Ten of Cups","49"],["King of Swords","50"],["Queen of Swords","51"],
-      ["Knight of Swords","52"],["Page of Swords","53"],["Ace of Swords","54"],["Two of Swords","55"],
-      ["Three of Swords","56"],["Four of Swords","57"],["Five of Swords","58"],["Six of Swords","59"],
-      ["Seven of Swords","60"],["Eight of Swords","61"],["Nine of Swords","62"],["Ten of Swords","63"],
-      ["King of Wands","64"],["Queen of Wands","65"],["Knight of Wands","66"],["Page of Wands","67"],
-      ["Ace of Wands","68"],["Two of Wands","69"],["Three of Wands","70"],["Four of Wands","71"],
-      ["Five of Wands","72"],["Six of Wands","73"],["Seven of Wands","74"],["Eight of Wands","75"],
-      ["Nine of Wands","76"],["Ten of Wands","77"]
-    ];
+    const cardList = [ 
+        ["The Fool","00"],["The Magician","01"],["The High Priestess","02"],["The Empress","03"], 
+        ["The Emperor","04"],["The Hierophant","05"],["The Lovers","06"],["The Chariot","07"], 
+        ["Strength","08"],["The Hermit","09"],["The Wheel of Fortune","10"],["Justice","11"], 
+        ["The Hanged Man","12"],["Death","13"],["Temperance","14"],["The Devil","15"], 
+        ["The Tower","16"],["The Star","17"],["The Moon","18"],["The Sun","19"], 
+        ["Judgement","20"],["The World","21"],["King of Pentacles","22"],["Queen of Pentacles","23"], 
+        ["Knight of Pentacles","24"],["Page of Pentacles","25"],["Ace of Pentacles","26"],["Two of Pentacles","27"], 
+        ["Three of Pentacles","28"],["Four of Pentacles","29"],["Five of Pentacles","30"],["Six of Pentacles","31"], 
+        ["Seven of Pentacles","32"],["Eight of Pentacles","33"],["Nine of Pentacles","34"],["Ten of Pentacles","35"], 
+        ["King of Cups","36"],["Queen of Cups","37"],["Knight of Cups","38"],["Page of Cups","39"], 
+        ["Ace of Cups","40"],["Two of Cups","41"],["Three of Cups","42"],["Four of Cups","43"], 
+        ["Five of Cups","44"],["Six of Cups","45"],["Seven of Cups","46"],["Eight of Cups","47"], 
+        ["Nine of Cups","48"],["Ten of Cups","49"],["King of Swords","50"],["Queen of Swords","51"], 
+        ["Knight of Swords","52"],["Page of Swords","53"],["Ace of Swords","54"],["Two of Swords","55"], 
+        ["Three of Swords","56"],["Four of Swords","57"],["Five of Swords","58"],["Six of Swords","59"], 
+        ["Seven of Swords","60"],["Eight of Swords","61"],["Nine of Swords","62"],["Ten of Swords","63"], 
+        ["King of Wands","64"],["Queen of Wands","65"],["Knight of Wands","66"],["Page of Wands","67"], 
+        ["Ace of Wands","68"],["Two of Wands","69"],["Three of Wands","70"],["Four of Wands","71"], 
+        ["Five of Wands","72"],["Six of Wands","73"],["Seven of Wands","74"],["Eight of Wands","75"], 
+        ["Nine of Wands","76"],["Ten of Wands","77"] 
+    ]; 
 
-    window.onload = () => {
-      const numberOfCards = 5;
-      const selectorContainer = document.getElementById('selectors');
-      const selects = [];
+    window.onload = () => { 
+        const numberOfCards = 5;
+        const selectorContainer = document.getElementById('selectors'); 
+        const selects = []; 
 
-      for (let i = 0; i < numberOfCards; i++) {
-        const group = document.createElement('div');
-        group.className = 'selector-group';
+        for (let i = 0; i < numberOfCards; i++) { 
+            const group = document.createElement('div'); 
+            group.className = 'selector-group'; 
 
-        const select = document.createElement('select');
-        const defaultOpt = document.createElement('option');
-        defaultOpt.value = '';
-        defaultOpt.text = `${i + 1}. ${positions[i]}`;
-        select.appendChild(defaultOpt);
-        cardList.forEach(([name, code], idx) => {
-          const opt = document.createElement('option');
-          opt.value = code;
-          opt.text = idx < 22 ? `${code} ${name}` : name;
-          select.appendChild(opt);
-        });
+            const select = document.createElement('select'); 
+            const defaultOpt = document.createElement('option'); 
+            defaultOpt.value = ''; 
+            defaultOpt.text = `${i + 1}. ${positions[i]}`; 
+            select.appendChild(defaultOpt); 
+            cardList.forEach(([name, code], idx) => { 
+                const opt = document.createElement('option'); 
+                opt.value = code; 
+                opt.text = idx < 22 ? `${code} ${name}` : name; 
+                select.appendChild(opt); 
+            }); 
 
-        selects.push(select);
+            selects.push(select); 
 
-        const rndBtn = document.createElement('button');
-        rndBtn.type = 'button';
-        rndBtn.textContent = 'DRAW';
-        rndBtn.className = 'random-btn';
-        rndBtn.addEventListener('click', () => {
-          const used = selects.map((s, j) => j === i ? null : s.value).filter(v => v);
-          const avail = cardList.map(c => c[1]).filter(c => !used.includes(c));
-          if (!avail.length) return;
-          const code = avail[Math.floor(Math.random() * avail.length)];
-          select.value = code;
-          select.dispatchEvent(new Event('change'));
-        });
+            const rndBtn = document.createElement('button'); 
+            rndBtn.type = 'button'; 
+            rndBtn.textContent = 'DRAW'; 
+            rndBtn.className = 'random-btn'; 
+            rndBtn.addEventListener('click', () => { 
+                const used = selects.map((s,j)=> j===i?null:s.value).filter(v=>v); 
+                const avail = cardList.map(c=>c[1]).filter(c=>!used.includes(c)); 
+                if (!avail.length) return; 
+                const code = avail[Math.floor(Math.random()*avail.length)]; 
+                select.value = code; 
+                select.dispatchEvent(new Event('change')); 
+            }); 
 
-        const flipBtn = document.createElement('button');
-        flipBtn.type = 'button';
-        flipBtn.textContent = 'FLIP';
-        flipBtn.className = 'random-btn';
-        flipBtn.addEventListener('click', () => {
-          // FLIP 버튼은 카드 앞면 이미지(card-front)를 회전시킵니다.
-          const img = document.getElementById(`img${i + 1}`);
-          const currentTransform = img.style.transform || 'rotate(0deg)';
-          img.style.transform = currentTransform.includes('180deg') ? 'rotate(0deg)' : 'rotate(180deg)';
-        });
+            const flipBtn = document.createElement('button'); 
+            flipBtn.type = 'button'; 
+            flipBtn.textContent = 'FLIP'; 
+            flipBtn.className = 'random-btn'; 
+            flipBtn.addEventListener('click', () => { 
+                const img = document.getElementById(`img${i + 1}`); 
+                const current = img.style.transform || 'rotate(0deg)'; 
+                const rotated = current.includes('180deg') ? 'rotate(0deg)' : 'rotate(180deg)'; 
+                img.style.transform = rotated; 
+            }); 
 
-        group.appendChild(select);
-        group.appendChild(rndBtn);
-        group.appendChild(flipBtn);
-        selectorContainer.appendChild(group);
+            group.appendChild(select); 
+            group.appendChild(rndBtn); 
+            group.appendChild(flipBtn); 
+            selectorContainer.appendChild(group); 
 
-        const drawOverlay = document.getElementById(`drawOverlay${i + 1}`);
-        if (drawOverlay) {
-          drawOverlay.querySelector('.draw-button').addEventListener('click', () => {
-             // 상단의 개별 DRAW 버튼과 동일한 기능 수행
-            rndBtn.click();
-          });
-        }
-        
-        select.addEventListener('change', function () {
-            const code = this.value;
+            // --- 카드 뒤집기 기능 추가 ---
             const slot = document.getElementById(`slot${i + 1}`);
-            const img = document.getElementById(`img${i + 1}`);
-            const overlay = document.getElementById(`drawOverlay${i + 1}`);
+            // 카드를 클릭하면 뒤집는 이벤트 리스너
+            slot.addEventListener('click', function() {
+                // 'is-drawn' 클래스가 있고 'flipped' 클래스가 없을 때만(즉, 뒷면 상태일 때만) 뒤집습니다.
+                if (this.classList.contains('is-drawn') && !this.classList.contains('flipped')) {
+                    this.classList.add('flipped');
+                }
+            });
 
-            if (code) {
-                // 이미지 소스 설정
-                img.src = `cards/${code}.jpg`;
-                
-                // 정/역방향 랜덤 설정 (카드 앞면에만 적용)
-                const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)';
-                img.style.transform = rot;
 
-                // 오버레이 숨기고 카드 뒤집기
-                overlay.classList.add('hidden');
-                slot.classList.add('is-flipped');
-            } else {
-                // 카드 선택 해제 시 원상태로
-                slot.classList.remove('is-flipped');
-                overlay.classList.remove('hidden');
-                // 애니메이션 끝난 후 이미지 소스 제거
-                setTimeout(() => {
-                    img.src = '';
-                }, 800); // CSS transition 시간과 맞춤
-            }
-        });
-      }
+            const drawOverlay = document.getElementById(`drawOverlay${i + 1}`); 
+            if (drawOverlay) { 
+                drawOverlay.querySelector('.draw-button').addEventListener('click', () => { 
+                    const used = selects.map((s,j)=> j===i?null:s.value).filter(v=>v); 
+                    const avail = cardList.map(c=>c[1]).filter(c=>!used.includes(c)); 
+                    if (!avail.length) return; 
+                    const code = avail[Math.floor(Math.random()*avail.length)]; 
+                    select.value = code; 
+                    select.dispatchEvent(new Event('change')); 
+                }); 
 
-      const allGroup = document.createElement('div');
-      allGroup.className = 'selector-group';
-      const allBtn = document.createElement('button');
-      allBtn.id = 'allRandomBtn';
-      allBtn.textContent = 'DRAW ALL';
-      allBtn.className = 'random-btn';
-      allBtn.addEventListener('click', () => {
-        const codes = cardList.map(c => c[1]);
-        const shuffled = codes.sort(() => Math.random() - 0.5);
-        selects.forEach((sel, j) => {
-          if (!sel.value) { // 이미 선택된 카드는 그대로 둠
-            sel.value = shuffled[j];
-            sel.dispatchEvent(new Event('change'));
-          }
-        });
-      });
-      allGroup.appendChild(allBtn);
-      selectorContainer.appendChild(allGroup);
+                select.addEventListener('change', function () { 
+                    const code = this.value; 
+                    const img = document.getElementById(`img${i + 1}`); 
+                    const overlay = document.getElementById(`drawOverlay${i + 1}`); 
+                    const currentSlot = document.getElementById(`slot${i + 1}`); // 현재 카드 슬롯 참조
 
-      const shGroup = document.createElement('div');
-      shGroup.className = 'selector-group';
-      const shBtn = document.createElement('button');
-      shBtn.id = 'shuffleBtn';
-      shBtn.textContent = 'New Spread';
-      shBtn.className = 'random-btn';
-      shBtn.addEventListener('click', () => location.reload());
-      shGroup.appendChild(shBtn);
-      selectorContainer.appendChild(shGroup);
+                    if (code) { 
+                        const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)'; 
+                        img.src = `cards/${code}.jpg`; 
+                        
+                        // 기존 스타일링 유지
+                        img.style.transition = 'opacity 2s ease';  
+                        img.style.transform = rot; 
+                        img.style.width = '100%'; 
+                        img.style.height = '100%'; 
+                        img.style.objectFit = 'cover'; 
+                        
+                        img.classList.remove('visible'); 
+                        setTimeout(() => { 
+                            img.classList.add('visible'); 
+                            img.style.transition = 'opacity 2s ease, transform 0.5s ease';  
+                        }, 10); 
+                        
+                        overlay.classList.add('hidden'); 
+                        
+                        // --- 카드 뒤집기 로직 ---
+                        // 카드가 뽑혔음을 표시하는 'is-drawn' 클래스를 추가하고,
+                        // 'flipped' 클래스를 제거하여 항상 뒷면으로 시작하도록 합니다.
+                        currentSlot.classList.add('is-drawn');
+                        currentSlot.classList.remove('flipped');
+                        
+                    } else { 
+                        img.src = ''; 
+                        img.classList.remove('visible'); 
+                        overlay.classList.remove('hidden'); 
+                        
+                        // --- 카드 뒤집기 로직 ---
+                        // 카드가 제거되면 클래스들을 초기화합니다.
+                        currentSlot.classList.remove('is-drawn');
+                        currentSlot.classList.remove('flipped');
+                    } 
+                }); 
+            } 
+        } 
 
-      const capGroup = document.createElement('div');
-      capGroup.className = 'selector-group';
-      const capBtn = document.createElement('button');
-      capBtn.id = 'captureBtn';
-      capBtn.textContent = 'CAPTURE';
-      capBtn.className = 'random-btn';
-      capBtn.addEventListener('click', async () => {
-        const element = document.querySelector('.spread');
-        try {
-          // 캡처 시 오버레이 일시적으로 숨기기
-          document.querySelectorAll('.draw-overlay').forEach(o => o.style.visibility = 'hidden');
-          const canvas = await html2canvas(element, { backgroundColor: null }); // 배경 투명하게 캡처
-          // 캡처 후 다시 보이게
-          document.querySelectorAll('.draw-overlay').forEach(o => o.style.visibility = 'visible');
+        // --- 나머지 버튼들은 기존과 동일 ---
+        const allGroup = document.createElement('div'); 
+        allGroup.className = 'selector-group'; 
+        const allBtn = document.createElement('button'); 
+        allBtn.id = 'allRandomBtn'; 
+        allBtn.textContent = 'DRAW ALL'; 
+        allBtn.className = 'random-btn'; 
+        allBtn.addEventListener('click', () => { 
+            const codes = cardList.map(c=>c[1]); 
+            const shuffled = codes.sort(()=>Math.random()-0.5); 
+            selects.forEach((sel,j)=>{ 
+                sel.value=shuffled[j]; 
+                sel.dispatchEvent(new Event('change')); 
+            }); 
+        }); 
+        allGroup.appendChild(allBtn); 
+        selectorContainer.appendChild(allGroup); 
 
-          canvas.toBlob((blob) => {
-            autoDownload(blob);
-            alert('스프레드가 저장되었어요! 😊');
-          }, 'image/jpeg');
+        const shGroup = document.createElement('div'); 
+        shGroup.className = 'selector-group'; 
+        const shBtn = document.createElement('button'); 
+        shBtn.id = 'shuffleBtn'; 
+        shBtn.textContent = 'New Spread'; 
+        shBtn.className = 'random-btn'; 
+        shBtn.addEventListener('click', () => location.reload()); 
+        shGroup.appendChild(shBtn); 
+        selectorContainer.appendChild(shGroup); 
 
-        } catch (err) {
-          console.error(err);
-          alert('캡처에 실패했어요… 콘솔을 확인해 주세요.');
-        }
-      });
-      capGroup.appendChild(capBtn);
-      selectorContainer.appendChild(capGroup);
-    };
-  </script>
+        const capGroup = document.createElement('div'); 
+        capGroup.className = 'selector-group'; 
+        const capBtn = document.createElement('button'); 
+        capBtn.id = 'captureBtn'; 
+        capBtn.textContent = 'CAPTURE'; 
+        capBtn.className = 'random-btn'; 
+        capBtn.addEventListener('click', async () => { 
+            const element = document.querySelector('.spread'); 
+            try { 
+                const canvas = await html2canvas(element, { backgroundColor: null }); // 배경 투명하게 캡쳐
+                canvas.toBlob((blob) => { 
+                    autoDownload(blob, 'tarozon-spread.png'); // 파일 형식 png로 변경
+                }, 'image/png'); 
+                alert('스프레드가 저장되었어요! 😊'); 
+            } catch (err) { 
+                console.error(err); 
+                alert('캡처에 실패했어요… 콘솔을 확인해 주세요.'); 
+            } 
+        }); 
+        capGroup.appendChild(capBtn); 
+        selectorContainer.appendChild(capGroup); 
+    }; 
+    </script> 
 
-  <script>
-    document.addEventListener('contextmenu', event => event.preventDefault());
-    document.addEventListener('keydown', function (e) {
-      if (
-        e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'c') ||
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && e.key === 'I')
-      ) {
-        e.preventDefault();
-      }
-    });
+    <script> 
+    document.addEventListener('contextmenu', event => event.preventDefault()); 
+    </script> 
 
-    function autoDownload(imageBlob) {
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(imageBlob);
-      const timestamp = new Date().toISOString().replace(/[:.-]/g, '');
-      a.download = `tarozon-capture-${timestamp}.jpg`;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    }
-  </script>
+    <script> 
+    document.addEventListener('keydown', function (e) { 
+        if ( 
+            e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'c') || 
+            e.key === 'F12' || 
+            (e.ctrlKey && e.shiftKey && e.key === 'I') 
+        ) { 
+            e.preventDefault(); 
+        } 
+    }); 
+    </script> 
 
-<div id="reading-section" style="margin-top: 40px; max-width: 800px; width: 90%; text-align: center;">
-  <h2>🔮 GPT 리딩 요청 자동 템플릿</h2>
-  <p>다음 칸에 질문을 입력한 뒤, 리딩 요청문을 생성하고 복사해서 ChatGPT에 붙여넣어보세요!</p>
-  <textarea id="userQuestion" placeholder="예: 이 것은 가치 있는 것일까? 내가 본 것이 정보적인 의미가 있을까?" style="width: 100%; height: 140px; padding: 10px; font-size: 14px; margin-bottom: 10px;"></textarea>
-  <br />
-  <button id="generateBtn" onclick="generatePrompt()">리딩 요청문 만들기</button>
-  <button id="copyBtn" onclick="copyPrompt()">📋 복사하기</button>
-  <button id="gptJumpBtn" onclick="goToChatGPT()">🤖 ChatGPT로 이동</button>
-  <button onclick="window.open('http://pf.kakao.com/_NgxjJn', '_blank')" style="
-  padding: 5px 10px;
-  background-color: #ffc0da;
-  color: #6e3b4e;
-  font-weight: 500;
-  border-radius: 6px;
-  border: 1.5px solid #f9c46b;
-  cursor: pointer;
-  margin-left: 8px;
-  box-shadow: 0 0 6px rgba(255, 179, 218, 0.6), 0 0 4px rgba(249, 196, 107, 0.5);
-  transition: transform 0.2s, box-shadow 0.2s;
-"
-onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 10px rgba(255, 179, 218, 0.8), 0 0 6px rgba(249, 196, 107, 0.7)'"
-onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(255, 179, 218, 0.6), 0 0 4px rgba(249, 196, 107, 0.5)'"
->
-  🌟 타로존 카카오 채널
-</button>
+    <script> 
+    function autoDownload(imageBlob, fileName) { 
+        const a = document.createElement("a"); 
+        a.href = URL.createObjectURL(imageBlob); 
+        const timestamp = new Date().toISOString().replace(/[:.-]/g, '');
+        a.download = fileName ? `tarozon-${timestamp}.png` : `tarozon-capture-${timestamp}.jpg`;
+        a.click(); 
+        URL.revokeObjectURL(a.href); 
+    } 
+    </script> 
 
-  <pre id="outputArea" style="background:#fff3; padding:1em; white-space:pre-wrap; min-height:120px; font-family:monospace; text-align:left; margin-top: 10px;"></pre>
-</div>
+    <div id="reading-section" style="margin-top: 40px; max-width: 800px; width: 90%; text-align: center;"> 
+    <h2>🔮 GPT 리딩 요청 자동 템플릿</h2> 
+    <p>다음 칸에 질문을 입력한 뒤, 리딩 요청문을 생성하고 복사해서 ChatGPT에 붙여넣어보세요!</p> 
+    <textarea id="userQuestion" placeholder="예: 이 것은 가치 있는 것일까? 내가 본 것이 정보적인 의미가 있을까?" style="width: 100%; height: 140px; padding: 10px; font-size: 14px; margin-bottom: 10px;"></textarea> 
+    <br /> 
+    <button id="generateBtn" onclick="generatePrompt()">리딩 요청문 만들기</button> 
+    <button id="copyBtn" onclick="copyPrompt()">📋 복사하기</button> 
+    <button id="gptJumpBtn" onclick="goToChatGPT()">🤖 ChatGPT로 이동</button> 
+    <button onclick="window.open('http://pf.kakao.com/_NgxjJn', '_blank')" style=" 
+    padding: 5px 10px; 
+    background-color: #ffc0da; 
+    color: #6e3b4e; 
+    font-weight: 500; 
+    border-radius: 6px; 
+    border: 1.5px solid #f9c46b; 
+    cursor: pointer; 
+    margin-left: 8px; 
+    box-shadow: 0 0 6px rgba(255, 179, 218, 0.6), 0 0 4px rgba(249, 196, 107, 0.5); 
+    transition: transform 0.2s, box-shadow 0.2s; 
+    " 
+    onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 10px rgba(255, 179, 218, 0.8), 0 0 6px rgba(249, 196, 107, 0.7)'" 
+    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(255, 179, 218, 0.6), 0 0 4px rgba(249, 196, 107, 0.5)'" 
+    > 
+    🌟 타로존 카카오 채널 
+    </button> 
 
-<script>
-  function getCardName(imgId) {
-    const img = document.getElementById(imgId);
-    if (!img || !img.src) return "(선택되지 않음)";
-    const code = img.src.split("/").pop().replace(".jpg", "");
-    const found = cardList.find(([_, c]) => c === code);
-    return found ? found[0] : code;
-  }
+    <pre id="outputArea" style="background:#fff3; padding:1em; white-space:pre-wrap; min-height:120px; font-family:monospace; text-align:left; margin-top: 10px;"></pre> 
+    </div> 
 
-  function generatePrompt() {
-    const question = document.getElementById("userQuestion").value.trim() || "(질문 내용 없음)";
-    const cardNames = [
-      getCardName("img1"),
-      getCardName("img2"),
-      getCardName("img3"),
-      getCardName("img4"),
-      getCardName("img5")
-    ];
+    <script> 
+    function getCardName(imgId) { 
+        const img = document.getElementById(imgId); 
+        if (!img || !img.src) return "(선택되지 않음)"; 
+        const code = img.src.split("/").pop().replace(".jpg", ""); 
+        const found = cardList.find(([_, c]) => c === code); 
+        return found ? found[0] : code; 
+    } 
 
-    const promptText = `내 질문은 다음과 같아:\n${question}\n\n사용한 카드는 라이더 웨이트 덱이고, 뽑은 카드는 아래와 같아.\n- 현재 상황: ${cardNames[0]}\n- 문제의 쟁점: ${cardNames[1]}\n- 문제의 해결책: ${cardNames[2]}\n- 가까운 미래: ${cardNames[3]}\n- 먼 미래: ${cardNames[4]}\n\n이 카드들을 바탕으로 전체적인 메시지를 구조적으로 정리해서 설명해줘.`;
+    function generatePrompt() { 
+        const question = document.getElementById("userQuestion").value.trim() || "(질문 내용 없음)"; 
+        const cardNames = [ 
+            getCardName("img1"), 
+            getCardName("img2"), 
+            getCardName("img3"), 
+            getCardName("img4"), 
+            getCardName("img5") 
+        ]; 
 
-    document.getElementById("outputArea").textContent = promptText;
-  }
+        const promptText = `내 질문은 다음과 같아:\n${question}\n\n사용한 카드는 라이더 웨이트 덱이고, 뽑은 카드는 아래와 같아.\n- 현재 상황: ${cardNames[0]}\n- 문제의 쟁점: ${cardNames[1]}\n- 문제의 해결책: ${cardNames[2]}\n- 가까운 미래: ${cardNames[3]}\n- 먼 미래: ${cardNames[4]}\n\n이 카드들을 바탕으로 전체적인 메시지를 구조적으로 정리해서 설명해줘.`; 
 
-  function copyPrompt() {
-    const text = document.getElementById("outputArea").textContent;
-    navigator.clipboard.writeText(text).then(() => alert("복사되었어요! GPT에 붙여넣기 하세요 ✨"));
-  }
+        document.getElementById("outputArea").textContent = promptText; 
+    } 
 
-  function goToChatGPT() {
-    const text = document.getElementById("outputArea").textContent;
-    if (!text.trim()) {
-      alert("먼저 리딩 요청문을 생성해 주세요!");
-      return;
-    }
-    navigator.clipboard.writeText(text).then(() => {
-      alert("리딩 요청문이 복사되었습니다. ChatGPT로 이동합니다.");
-      window.open("https://chat.openai.com", "_blank");
-    });
-  }
-</script>
-</body>
-</html>
+    function copyPrompt() { 
+        const text = document.getElementById("outputArea").textContent; 
+        navigator.clipboard.writeText(text).then(() => alert("복사되었어요! GPT에 붙여넣기 하세요 ✨")); 
+    } 
+
+    function goToChatGPT() { 
+        const text = document.getElementById("outputArea").textContent; 
+        if (!text.trim()) { 
+            alert("먼저 리딩 요청문을 생성해 주세요!"); 
+            return; 
+        } 
+        navigator.clipboard.writeText(text).then(() => { 
+            alert("리딩 요청문이 복사되었습니다. ChatGPT로 이동합니다."); 
+            window.open("https://chat.openai.com", "_blank"); 
+        }); 
+    } 
+    </script> 
+ </body> 
+ </html>
