@@ -62,27 +62,26 @@
         justify-content: center;
         margin-top: 20px;
     }
-    /* --- 1카드에 맞게 수정된 부분 --- */
     .spread {
         position: relative !important;
-        display: flex; /* 자식 요소를 중앙 정렬하기 위해 flex로 변경 */
+        display: flex; 
         justify-content: center;
         align-items: center;
         width: 100%;
-        aspect-ratio: 4 / 3; /* 1개 카드에 더 적합한 비율로 조정 */
+        aspect-ratio: 4 / 3;
     }
     
     /* --- 카드 슬롯 설정 --- */
     .card-slot {
-        position: relative !important; /* absolute에서 relative로 변경 */
-        width: 30%; /* 카드의 너비를 키움 */
-        height: 70%; /* 카드의 높이를 키움 */
+        position: relative !important;
+        width: 30%; 
+        height: 70%;
         border: none;
         background-color: transparent;
         perspective: 1000px;
+        /* 부드러운 크기 전환 효과를 위해 transition 추가 */
+        transition: width 0.3s ease, height 0.3s ease;
     }
-
-    /* --- 기존 5카드 위치 설정은 모두 삭제 --- */
 
     /* --- 카드 뒤집기 관련 CSS (변경 없음) --- */
     .flip-card-inner {
@@ -194,6 +193,14 @@
         padding: 5px 8px;
       }
     }
+
+    /* ✨ 모바일 세로 화면에서 카드 크기를 키우는 미디어 쿼리 ✨ */
+    @media (max-width: 768px) and (orientation: portrait) {
+      .card-slot {
+        width: 42%; /* 기존 30%에서 약 40% 증가 */
+        height: 98%; /* 기존 70%에서 약 40% 증가 (카드 비율 유지) */
+      }
+    }
 </style>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
@@ -210,7 +217,7 @@
         <div class="flip-card-back">
           <img src="/cards/card-back.jpg" class="card-back-image" alt="카드 뒷면">
           <div class="draw-overlay" id="drawOverlay1">
-              <span class="position-text">오늘의 메시지</span>
+              <span class="position-text">1카드 메시지</span>
               <button class="draw-button">DRAW</button>
           </div>
         </div>
@@ -223,8 +230,7 @@
 </div>
 
   <script>
-    // 1. positions 배열을 1개 요소로 수정
-    const positions = ["오늘의 메시지"];
+    const positions = ["1카드 메시지"];
     const cardList = [
       ["The Fool","00"],["The Magician","01"],["The High Priestess","02"],["The Empress","03"],
       ["The Emperor","04"],["The Hierophant","05"],["The Lovers","06"],["The Chariot","07"],
@@ -249,12 +255,10 @@
     ];
 
     window.onload = () => {
-      // 2. numberOfCards를 1로 변경
       const numberOfCards = 1;
       const selectorContainer = document.getElementById('selectors');
       const selects = [];
 
-      // for 루프는 자동으로 1번만 실행됨
       for (let i = 0; i < numberOfCards; i++) {
         const group = document.createElement('div');
         group.className = 'selector-group';
@@ -331,8 +335,6 @@
             }
         });
       }
-
-      // 3. 'DRAW ALL' 버튼 생성 코드를 삭제
       
       const shGroup = document.createElement('div');
       shGroup.className = 'selector-group';
@@ -440,12 +442,11 @@ onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(
     return found ? found[0] : code;
   }
   
-  // 4. generatePrompt 함수를 1카드용으로 수정
   function generatePrompt() {
     const question = document.getElementById("userQuestion").value.trim() || "(질문 내용 없음)";
     const cardName = getCardName("img1");
 
-    const promptText = `내 질문은 다음과 같아:\n${question}\n\n사용한 카드는 라이더 웨이트 덱이고, 뽑은 카드는 아래와 같아.\n- 오늘의 메시지: ${cardName}\n\n이 카드를 바탕으로 내 질문에 대한 답변을 해주고, 카드에 대한 조언도 함께 해줘.`;
+    const promptText = `내 질문은 다음과 같아:\n${question}\n\n사용한 카드는 라이더 웨이트 덱이고, 뽑은 카드는 아래와 같아.\n- 1카드: ${cardName}\n\n이 카드를 바탕으로 내 질문에 대한 답변을 해주고, 카드에 대한 조언도 함께 해줘.`;
 
     document.getElementById("outputArea").textContent = promptText;
   }
@@ -469,4 +470,3 @@ onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(
 </script>
 </body>
 </html>
-```
