@@ -16,172 +16,163 @@
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
   <style>
-  /* --- 기본 및 레이아웃 설정 --- */
-  * {
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-  body {
-    font-family: sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #fdf6e3;
-    padding: 20px;
-    box-sizing: border-box; /* 패딩이 전체 너비에 포함되도록 설정 */
-  }
-  h1 {
-    margin-top: 20px;
-    text-align: center; /* 제목이 여러 줄이 될 경우를 대비 */
-  }
-
-  /* --- 상단 컨트롤 버튼 및 드롭다운 --- */
-  #selectors {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .selector-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-  }
-  select, .random-btn, #allRandomBtn, #shuffleBtn, #captureBtn {
-    padding: 6px 12px;
-    font-size: 14px;
-    cursor: pointer;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-  }
-  select {
-    width: 160px;
-  }
-  
-  /* --- 카드 스프레드 컨테이너 --- */
-  .spread-wrapper {
-    width: 100%;
-    max-width: 600px; /* 데스크탑에서 너무 넓어지지 않도록 최대 너비 설정 */
-    margin-top: 20px;
-  }
-  .spread {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    /* [수정] 고정 40px 간격 대신, 화면 너비에 비례하는 유연한 간격 사용 */
-    gap: 2vw;
-  }
-
-  /* --- 카드 슬롯 및 뒤집기 애니메이션 --- */
-  .card-slot {
-    /* [수정] 3개의 카드가 한 화면에 들어오도록 너비를 비율로 설정 */
-    width: 30%;
-    /* [수정] 카드가 원본보다 커지지 않도록 최대 너비 설정 */
-    max-width: 144px;
-    /* [수정] 높이를 자동으로 설정하여 비율을 유지하도록 함 */
-    height: auto;
-    /* [수정] 카드의 가로:세로 비율을 고정하여 모양이 깨지지 않게 함 */
-    aspect-ratio: 144 / 252;
-    
-    border: none;
-    background-color: transparent;
-    perspective: 1000px; /* 3D 효과를 위한 원근감 설정 */
-  }
-  .flip-card-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    transition: transform 0.8s;
-    transform-style: preserve-3d;
-  }
-  .card-slot.is-flipped .flip-card-inner {
-    transform: rotateY(180deg);
-  }
-  .flip-card-front, .flip-card-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  }
-  .flip-card-front {
-    transform: rotateY(180deg);
-  }
-  .flip-card-back {
-    background-color: #fff;
-  }
-  .card-slot img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block; /* 이미지 하단 여백 제거 */
-  }
-  
-  /* --- 카드 위 'DRAW' 버튼 오버레이 --- */
-  .draw-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    background-color: rgba(0, 0, 0, 0.3);
-    z-index: 10;
-    cursor: pointer;
-    opacity: 1;
-    transition: opacity 0.5s;
-    color: white;
-    text-shadow: 1px 1px 3px black;
-    text-align: center;
-  }
-  .draw-overlay .position-text {
-    font-size: 1.5em;
-    font-weight: bold;
-  }
-  .draw-overlay .draw-button {
-    padding: 10px 20px;
-    font-size: 1.2em;
-    cursor: pointer;
-    background-color: #ff77aa;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: background-color 0.2s, transform 0.2s;
-  }
-  .draw-overlay .draw-button:hover {
-    background-color: #e66099;
-    transform: translateY(-2px);
-  }
-  .card-slot.is-flipped .draw-overlay {
-    opacity: 0;
-    pointer-events: none; /* 화면에 보이지 않을 때 클릭 이벤트 방지 */
-  }
-  
-  /* --- 모바일 화면 대응 미디어 쿼리 --- */
-  @media only screen and (max-width: 768px) {
+    * {
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
     body {
-      padding: 10px; /* 모바일 화면에서 여백 줄임 */
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #fdf6e3;
+      padding: 20px;
     }
     h1 {
-      font-size: 1.5em; /* 모바일 제목 폰트 크기 조절 */
+      margin-top: 20px;
     }
-    /* [수정] 기존 mobile.css의 충돌 해결 코드는
-      이미 위의 .card-slot 반응형 스타일로 대체되었으므로
-      별도로 필요하지 않습니다. 필요한 경우 여기에 추가 규칙을 작성할 수 있습니다.
-    */
-  }
-</style>
+    #selectors {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .selector-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    select, .random-btn, #allRandomBtn, #shuffleBtn, #captureBtn {
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    select {
+      width: 160px;
+    }
+    .spread-wrapper {
+      width: 100%;
+      max-width: 600px;
+    }
+    
+    /* [수정 1] 카드 크기 및 간격 문제 해결 */
+    .spread {
+      display: flex;
+      justify-content: center;
+      gap: 2vw; /* 화면 너비에 따라 간격 유연하게 조절 */
+      margin-top: 20px;
+      width: 100%;
+    }
+    .card-slot {
+      width: 30%; /* 3개 카드가 한 줄에 들어오도록 설정 */
+      max-width: 144px; /* 카드가 너무 커지지 않게 제한 */
+      height: auto; /* 높이는 자동으로 조절 */
+      aspect-ratio: 144 / 252; /* 원래 카드 비율 유지 */
+      
+      border: none;
+      background-color: transparent;
+      perspective: 1000px;
+    }
+    /* --- 카드 뒤집기 기능 CSS 원본 유지 --- */
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+    .card-slot.is-flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .flip-card-front {
+      transform: rotateY(180deg);
+    }
+    .flip-card-back {
+      background-color: #fff;
+    }
+    .card-back-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .draw-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.3);
+      z-index: 10;
+      cursor: pointer;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: white;
+      text-shadow: 1px 1px 3px black;
+      text-align: center;
+      flex-direction: column;
+      gap: 10px;
+      opacity: 1;
+      transition: opacity 0.5s;
+    }
+    .card-slot.is-flipped .draw-overlay {
+        opacity: 0;
+        pointer-events: none;
+    }
+    .draw-overlay .draw-button {
+        padding: 10px 20px;
+        font-size: 1.2em;
+        cursor: pointer;
+        background-color: #ff77aa;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: background-color 0.2s, transform 0.2s;
+    }
+    .draw-overlay .draw-button:hover {
+        background-color: #e66099;
+        transform: translateY(-2px);
+    }
+
+    .card-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 1;
+      transform: rotate(0deg);
+      position: static;
+      z-index: auto;
+    }
+    
+    @media only screen and (max-width: 768px) {
+      .card-slot {
+        display: block;
+        border: none;
+        background-color: transparent;
+      }
+      .card-slot img {
+        opacity: 1;
+        transition: none;
+      }
+    }
+  </style>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
@@ -193,14 +184,13 @@
   <div id="selectors"></div>
   <div class="spread-wrapper">
     <div class="spread">
-      <!-- ✨ 3. 카드 뒤집기를 위한 HTML 구조 변경 -->
       <div class="card-slot" id="cardSlot1">
         <div class="flip-card-inner">
           <div class="flip-card-back">
             <img src="/cards/card-back.jpg" class="card-back-image" alt="카드 뒷면">
             <div class="draw-overlay" id="drawOverlay1">
-                <span class="position-text">과거</span>
-                <button class="draw-button">DRAW</button>
+              <span class="position-text">과거</span>
+              <button class="draw-button">DRAW</button>
             </div>
           </div>
           <div class="flip-card-front">
@@ -213,8 +203,8 @@
           <div class="flip-card-back">
             <img src="/cards/card-back.jpg" class="card-back-image" alt="카드 뒷면">
             <div class="draw-overlay" id="drawOverlay2">
-                <span class="position-text">현재</span>
-                <button class="draw-button">DRAW</button>
+              <span class="position-text">현재</span>
+              <button class="draw-button">DRAW</button>
             </div>
           </div>
           <div class="flip-card-front">
@@ -227,8 +217,8 @@
           <div class="flip-card-back">
             <img src="/cards/card-back.jpg" class="card-back-image" alt="카드 뒷면">
             <div class="draw-overlay" id="drawOverlay3">
-                <span class="position-text">미래</span>
-                <button class="draw-button">DRAW</button>
+              <span class="position-text">미래</span>
+              <button class="draw-button">DRAW</button>
             </div>
           </div>
           <div class="flip-card-front">
@@ -298,6 +288,7 @@
           select.dispatchEvent(new Event('change'));
         });
 
+        // 원래 있던 FLIP 버튼 로직 그대로 복원
         const flipBtn = document.createElement('button');
         flipBtn.type = 'button';
         flipBtn.textContent = 'FLIP';
@@ -325,17 +316,18 @@
             select.dispatchEvent(new Event('change'));
         });
 
-        // ✨ 4. JavaScript 이벤트 로직 수정
+        // [수정 2] 카드 뒤집기 로직 문제 해결
         select.addEventListener('change', function () {
             const code = this.value;
             const img = document.getElementById(`img${i + 1}`);
             const cardSlot = document.getElementById(`cardSlot${i + 1}`);
 
             if (code) {
+                // 이미지 회전(정/역)과 카드 뒤집기(앞/뒤)를 분리
                 const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)';
                 img.src = `/cards/${code}.jpg`;
-                img.style.transform = rot; 
-                cardSlot.classList.add('is-flipped');
+                img.style.transform = rot; // 이미지 자체의 정/역방향 설정
+                cardSlot.classList.add('is-flipped'); // 카드를 뒤집는 CSS 클래스 추가
             } else {
                 img.src = '';
                 cardSlot.classList.remove('is-flipped');
@@ -398,7 +390,6 @@
     };
   </script>
 
-  <!-- 나머지 스크립트와 GPT 연동 섹션은 그대로 유지 -->
   <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
     document.addEventListener('keydown', function (e) {
@@ -450,6 +441,7 @@
   </div>
 
   <script>
+    // GPT 관련 스크립트 원본으로 복원
     function getCardName(imgId) {
       const img = document.getElementById(imgId);
       if (!img || !img.src) return "(선택되지 않음)";
