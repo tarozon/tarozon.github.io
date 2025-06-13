@@ -54,42 +54,35 @@
       width: 160px;
     }
 
-    /* --- ✨ 1. 레이아웃 컨테이너 설정 --- */
+    /* --- ✨ 1. 레이아웃 컨테이너 설정 (단순 Flex 방식으로 복귀) --- */
     .spread-wrapper {
         width: 100%;
-        max-width: 600px; /* 3카드에 적합한 최대 너비로 조정 */
-        display: flex;
-        justify-content: center;
-        margin-top: 20px;
+        padding: 0 10px; /* 모바일에서 좌우 여백 확보 */
     }
     .spread {
-        position: relative !important;
-        display: block !important;
-        width: 100%;
-        /* 컨테이너 비율을 카드 높이에 맞게 설정 (가로:세로 = 600:252) */
-        aspect-ratio: 600 / 252;
+      display: flex;
+      justify-content: center;
+      align-items: center; /* 카드들을 세로 중앙 정렬 */
+      gap: 4%; /* 고정값이 아닌 %로 간격 설정 */
+      margin-top: 20px;
+      width: 100%;
     }
 
-    /* --- ✨ 2. 카드 슬롯 설정 --- */
+    /* --- ✨ 2. 카드 슬롯을 반응형으로 변경 --- */
     .card-slot {
-      position: absolute !important;
-      /* 카드의 크기를 % 단위로 변경 */
-      width: 30%; /* 3개의 카드가 적절한 간격을 갖도록 너비 설정 */
-      height: 100%;
-      bottom: 0; /* 모든 카드를 컨테이너 하단에 정렬 */
+      /* 고정 크기 대신 % 너비와 최대 크기 지정 */
+      width: 30%;
+      max-width: 144px; /* 카드가 너무 커지는 것을 방지 */
+      /* 카드의 가로:세로 비율(144:252)을 유지 */
+      aspect-ratio: 144 / 252;
+      
+      /* 기존 속성 유지 */
       border: none;
       background-color: transparent;
       perspective: 1000px;
     }
 
-    /* --- ✨ 3. 카드 위치를 % 단위로 재설정 --- */
-    /* id가 slot이 아닌 cardSlot으로 되어 있어 수정합니다. */
-    #cardSlot1 { left: 2.5%; }
-    #cardSlot2 { left: 50%; transform: translateX(-50%); }
-    #cardSlot3 { right: 2.5%; }
-
-
-    /* --- ✨ 4. 카드 뒤집기 및 내부 UI 스타일 (대부분 변경 없음) --- */
+    /* --- ✨ 3. 카드 뒤집기 및 내부 UI 스타일 (변경 없음) --- */
     .flip-card-inner {
       position: relative;
       width: 100%;
@@ -179,10 +172,10 @@
       z-index: auto;
     }
 
-    /* --- ✨ 5. 모바일 반응형 폰트 크기 조절 --- */
+    /* --- ✨ 4. 모바일 반응형 폰트 크기 조절 --- */
     @media (max-width: 768px) {
       .draw-overlay {
-        font-size: 4vw; /* 3카드 배열은 카드가 비교적 크므로 폰트를 조금 더 키웁니다 */
+        font-size: 4vw;
         gap: 5px;
       }
 
