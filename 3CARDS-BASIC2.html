@@ -62,12 +62,10 @@
     width: 160px;
   }
 
-  /* 📌 핵심: 한 줄 3장, 스크롤 없이 */
   .spread-wrapper {
     width: 100%;
     max-width: 1000px;
-    margin-top: 20px;
-    padding: 0 5%;
+    padding: 0;
   }
 
   .spread {
@@ -75,14 +73,17 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    aspect-ratio: 3 / 2; /* 핵심!! 카드 3개가 들어갈 비율 */
+    margin-top: 20px;
   }
 
   .card-slot {
-    width: 30%; /* 3장 = 90%, 나머지 10%는 여백으로 분산 */
-    aspect-ratio: 144 / 252;
+    width: 32%; /* 3장 + 간격 약간 확보 */
+    height: 100%;
     border: none;
     background-color: transparent;
     perspective: 1000px;
+    flex-shrink: 0;
   }
 
   .flip-card-inner {
@@ -182,8 +183,11 @@
     transform: translateY(-2px);
   }
 
-  /* 📱 모바일 대응 */
+  /* 모바일 대응 */
   @media (max-width: 768px) {
+    .spread {
+      aspect-ratio: 3 / 4; /* 세로형 화면 비율에서 카드 전체 살리기 */
+    }
     .card-slot {
       width: 30%;
     }
@@ -211,6 +215,7 @@
     }
   }
 </style>
+
 
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
