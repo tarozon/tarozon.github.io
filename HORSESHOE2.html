@@ -57,22 +57,20 @@
     /* --- 레이아웃 컨테이너 설정 --- */
     .spread-wrapper {
         width: 100%;
-        max-width: 1000px; /* 데스크톱에서 최대 너비 제한 */
+        max-width: 1000px;
         display: flex;
         justify-content: center;
         margin-top: 20px;
     }
     .spread {
-        /* !important 를 추가하여 다른 CSS 규칙보다 우선 적용 */
         position: relative !important;
-        display: block !important; /* flex가 아닌 block으로 강제 */
+        display: block !important;
         width: 100%;
         aspect-ratio: 10 / 6;
     }
     
     /* --- 카드 슬롯 설정 --- */
     .card-slot {
-      /* !important 를 추가하여 다른 CSS 규칙보다 우선 적용 */
       position: absolute !important;
       width: 14.4%;
       height: 42%;
@@ -142,6 +140,8 @@
       gap: 10px;
       opacity: 1;
       transition: opacity 0.5s;
+      /* 텍스트가 넘치면 숨기도록 추가 */
+      overflow: hidden;
     }
     .card-slot.is-flipped .draw-overlay {
         opacity: 0;
@@ -157,6 +157,12 @@
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         transition: background-color 0.2s, transform 0.2s;
+        /* 버튼이 너무 커지지 않게 최대 너비 설정 */
+        max-width: 90%;
+        /* 텍스트가 길어지면 ...으로 표시 */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .draw-overlay .draw-button:hover {
         background-color: #e66099;
@@ -172,6 +178,34 @@
       position: static;
       z-index: auto;
     }
+
+    /* ✨✨✨ 여기부터가 새로 추가된 부분입니다 ✨✨✨ */
+    /* 화면 너비가 768px 이하일 때 (모바일 환경) 적용 */
+    @media (max-width: 768px) {
+      .draw-overlay {
+        /* vw 단위를 사용해 화면 너비에 비례하여 폰트 크기 조절 */
+        font-size: 2.5vw; 
+        gap: 5px; /* 텍스트와 버튼 사이 간격 줄이기 */
+      }
+
+      .draw-overlay .draw-button {
+        /* 버튼의 폰트 크기와 패딩을 줄여서 작게 만듦 */
+        font-size: 2.2vw;
+        padding: 8px 10px;
+        border-radius: 6px;
+      }
+    }
+    /* 화면 너비가 매우 작은 기기(예: 400px 이하)를 위한 추가 조절 */
+    @media (max-width: 400px) {
+      .draw-overlay {
+        font-size: 10px; /* vw대신 고정값으로 최소 크기 보장 */
+      }
+      .draw-overlay .draw-button {
+        font-size: 9px; /* vw대신 고정값으로 최소 크기 보장 */
+        padding: 5px 8px;
+      }
+    }
+
 </style>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
