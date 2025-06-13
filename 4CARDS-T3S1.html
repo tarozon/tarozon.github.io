@@ -59,19 +59,48 @@
       gap: 40px;
       margin-top: 20px;
     }
+
+    /* --- ✨ 1. 카드 뒤집기 기능 CSS 추가 --- */
     .card-slot {
       width: 144px;
       height: 252px;
-      border: 1px solid #ccc;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: white;
-      overflow: hidden;
-      position: relative; /* 10번: 자식 요소를 위해 추가 */
+      border: none;
+      background-color: transparent;
+      perspective: 1000px;
     }
-    /* 10. 각 카드 슬롯 내 DRAW 버튼 기능 추가 및 가시성 토글을 위한 CSS */
-    .card-slot .draw-overlay {
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+    .card-slot.is-flipped .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .flip-card-front {
+      transform: rotateY(180deg);
+    }
+    .flip-card-back {
+      background-color: #fff;
+    }
+    .card-back-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .draw-overlay {
       position: absolute;
       top: 0;
       left: 0;
@@ -80,22 +109,24 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: rgba(255, 255, 255, 0.8);
+      background-color: rgba(0, 0, 0, 0.3);
       z-index: 10;
       cursor: pointer;
       font-size: 1.5em;
       font-weight: bold;
-      color: #333;
+      color: white;
+      text-shadow: 1px 1px 3px black;
       text-align: center;
       flex-direction: column;
       gap: 10px;
-      transition: opacity 0.3s ease;
+      opacity: 1;
+      transition: opacity 0.5s;
     }
-    .card-slot .draw-overlay.hidden {
+    .card-slot.is-flipped .draw-overlay {
         opacity: 0;
         pointer-events: none;
     }
-    .card-slot .draw-overlay button {
+    .draw-overlay .draw-button {
         padding: 10px 20px;
         font-size: 1.2em;
         cursor: pointer;
@@ -106,24 +137,32 @@
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         transition: background-color 0.2s, transform 0.2s;
     }
-    .card-slot .draw-overlay button:hover {
+    .draw-overlay .draw-button:hover {
         background-color: #e66099;
         transform: translateY(-2px);
     }
 
     .card-slot img {
+      width: 100%;
       height: 100%;
-      width: auto;
-      object-fit: contain;
-      /* 7. FLIP 버튼 회전 애니메이션 효과 적용 */
-      transition: opacity 2s ease, transform 0.5s ease;
-      opacity: 0;
-      transform: rotate(0deg);
-      position: relative; /* 10번: z-index를 위해 추가 */
-      z-index: 5; /* 10번: 오버레이 아래로 오도록 */
-    }
-    .card-slot img.visible {
+      object-fit: cover;
       opacity: 1;
+      transform: rotate(0deg);
+      position: static;
+      z-index: auto;
+    }
+    
+    /* --- ✨ 2. mobile.css 충돌 해결을 위한 미디어 쿼리 추가 --- */
+    @media only screen and (max-width: 768px) {
+      .card-slot {
+        display: block;
+        border: none;
+        background-color: transparent;
+      }
+      .card-slot img {
+        opacity: 1;
+        transition: none;
+      }
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -136,40 +175,68 @@
   <div id="selectors"></div>
 <div class="spread-wrapper">
   <div class="spread">
+    <!-- ✨ 3. 카드 뒤집기를 위한 HTML 구조 변경 -->
     <div class="card-slot" id="cardSlot1">
-        <div class="draw-overlay" id="drawOverlay1">
-            <span class="position-text">통합1</span>
-            <button class="draw-button">DRAW</button>
+      <div class="flip-card-inner">
+        <div class="flip-card-back">
+          <img src="/cards/card-back.jpg" class="card-back-image" alt="카드 뒷면">
+          <div class="draw-overlay" id="drawOverlay1">
+              <span class="position-text">통합1</span>
+              <button class="draw-button">DRAW</button>
+          </div>
         </div>
-        <img id="img1" />
+        <div class="flip-card-front">
+          <img id="img1" />
+        </div>
+      </div>
     </div>
     <div class="card-slot" id="cardSlot2">
-        <div class="draw-overlay" id="drawOverlay2">
-            <span class="position-text">통합2</span>
-            <button class="draw-button">DRAW</button>
+      <div class="flip-card-inner">
+        <div class="flip-card-back">
+          <img src="/cards/card-back.jpg" class="card-back-image" alt="카드 뒷면">
+          <div class="draw-overlay" id="drawOverlay2">
+              <span class="position-text">통합2</span>
+              <button class="draw-button">DRAW</button>
+          </div>
         </div>
-        <img id="img2" />
+        <div class="flip-card-front">
+          <img id="img2" />
+        </div>
+      </div>
     </div>
     <div class="card-slot" id="cardSlot3">
-        <div class="draw-overlay" id="drawOverlay3">
-            <span class="position-text">통합3</span>
-            <button class="draw-button">DRAW</button>
+      <div class="flip-card-inner">
+        <div class="flip-card-back">
+          <img src="/cards/card-back.jpg" class="card-back-image" alt="카드 뒷면">
+          <div class="draw-overlay" id="drawOverlay3">
+              <span class="position-text">통합3</span>
+              <button class="draw-button">DRAW</button>
+          </div>
         </div>
-        <img id="img3" />
+        <div class="flip-card-front">
+          <img id="img3" />
+        </div>
+      </div>
     </div>
     <div class="card-slot" id="cardSlot4">
-        <div class="draw-overlay" id="drawOverlay4">
-            <span class="position-text">보조카드</span>
-            <button class="draw-button">DRAW</button>
+        <div class="flip-card-inner">
+          <div class="flip-card-back">
+            <img src="/cards/card-back.jpg" class="card-back-image" alt="카드 뒷면">
+            <div class="draw-overlay" id="drawOverlay4">
+                <span class="position-text">보조카드</span>
+                <button class="draw-button">DRAW</button>
+            </div>
+          </div>
+          <div class="flip-card-front">
+            <img id="img4" />
+          </div>
         </div>
-        <img id="img4" />
-    </div>
+      </div>
   </div>
 </div>
 
   <script>
-    // 4. JavaScript 전역 변수 및 함수 스코프 관리: 전역 변수 유지
-    const positions = ["통합1", "통합2", "통합3", "보조카드"]; // 스프레드 제목에 맞게 변경
+    const positions = ["통합1", "통합2", "통합3", "보조카드"];
     const cardList = [
       ["The Fool","00"],["The Magician","01"],["The High Priestess","02"],["The Empress","03"],
       ["The Emperor","04"],["The Hierophant","05"],["The Lovers","06"],["The Chariot","07"],
@@ -194,13 +261,11 @@
     ];
 
     window.onload = () => {
-      // 스프레드 카드의 개수를 4개로 조정
-      const numberOfCards = 4; // ✨ 3에서 4로 변경
-
+      const numberOfCards = 4;
       const selectorContainer = document.getElementById('selectors');
-      const selects = []; // 각 select 요소를 저장할 배열
+      const selects = [];
 
-      for (let i = 0; i < numberOfCards; i++) { // ✨ numberOfCards 사용
+      for (let i = 0; i < numberOfCards; i++) {
         const group = document.createElement('div');
         group.className = 'selector-group';
 
@@ -212,14 +277,12 @@
         cardList.forEach(([name, code], idx) => {
           const opt = document.createElement('option');
           opt.value = code;
-          // 3. cardList 데이터 활용: 메이저 아르카나만 번호 표시 조건 유지
           opt.text = idx < 22 ? `${code} ${name}` : name;
           select.appendChild(opt);
         });
 
-        selects.push(select); // select 엘리먼트는 여전히 필요
+        selects.push(select);
 
-        // 10. 원래의 개별 DRAW 버튼 다시 추가
         const rndBtn = document.createElement('button');
         rndBtn.type = 'button';
         rndBtn.textContent = 'DRAW';
@@ -249,11 +312,10 @@
         group.appendChild(flipBtn);
         selectorContainer.appendChild(group);
 
-        // 10. 각 카드 슬롯의 DRAW 오버레이에 이벤트 리스너 추가 및 가시성 토글
         const drawOverlay = document.getElementById(`drawOverlay${i + 1}`);
-        // drawOverlay가 null이 아닐 때만 이벤트 리스너 추가 (보조카드를 위해 추가)
-        if (drawOverlay) {
-            drawOverlay.querySelector('.draw-button').addEventListener('click', () => {
+        if(drawOverlay) {
+            drawOverlay.querySelector('.draw-button').addEventListener('click', (e) => {
+                e.stopPropagation(); 
                 const used = selects.map((s,j)=> j===i?null:s.value).filter(v=>v);
                 const avail = cardList.map(c=>c[1]).filter(c=>!used.includes(c));
                 if (!avail.length) return;
@@ -261,43 +323,25 @@
                 select.value = code;
                 select.dispatchEvent(new Event('change'));
             });
-
-            select.addEventListener('change', function () {
-                const code = this.value;
-                const img = document.getElementById(`img${i + 1}`);
-                const overlay = document.getElementById(`drawOverlay${i + 1}`);
-
-                if (code) {
-                    const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)';
-                    img.src = `cards/${code}.jpg`;
-                    
-                    // 7. DRAW 시에는 애니메이션 없이 즉시 회전
-                    img.style.transition = 'opacity 2s ease'; 
-                    img.style.transform = rot;
-                    img.style.width = '100%';
-                    img.style.height = '100%';
-                    img.style.objectFit = 'cover';
-
-                    img.classList.remove('visible');
-                    setTimeout(() => {
-                        img.classList.add('visible');
-                        // 7. FLIP 버튼을 위해 다시 transform transition 추가
-                        img.style.transition = 'opacity 2s ease, transform 0.5s ease'; 
-                    }, 10);
-                    overlay.classList.add('hidden'); // 카드 선택 시 오버레이 숨김
-                } else {
-                    img.src = '';
-                    img.classList.remove('visible');
-                    overlay.classList.remove('hidden'); // 카드 미선택 시 오버레이 다시 표시
-                }
-            });
         }
-      }
 
-      // ✨ 기존의 보조카드 관련 로직은 위의 for 루프에 통합됨
-      // 기존 코드는 3카드 스프레드에 보조카드가 추가되는 방식이었으나,
-      // 이제 모든 카드를 4개 루프에서 처리합니다.
-      // 따라서, 별도의 subGroup, subSelect, subDrawBtn, subFlipBtn 로직은 제거됩니다.
+        // ✨ 4. JavaScript 이벤트 로직 수정
+        select.addEventListener('change', function () {
+            const code = this.value;
+            const img = document.getElementById(`img${i + 1}`);
+            const cardSlot = document.getElementById(`cardSlot${i + 1}`);
+
+            if (code) {
+                const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)';
+                img.src = `/cards/${code}.jpg`;
+                img.style.transform = rot; 
+                cardSlot.classList.add('is-flipped');
+            } else {
+                img.src = '';
+                cardSlot.classList.remove('is-flipped');
+            }
+        });
+      }
 
       const allGroup = document.createElement('div');
       allGroup.className = 'selector-group';
@@ -308,7 +352,6 @@
       allBtn.addEventListener('click', () => {
         const codes = cardList.map(c=>c[1]);
         const shuffled = codes.sort(()=>Math.random()-0.5);
-        // selects 배열에 모든 select 요소가 포함되어 있으므로 바로 사용
         selects.forEach((sel,j)=>{
           sel.value=shuffled[j];
           sel.dispatchEvent(new Event('change'));
@@ -334,18 +377,23 @@
       capBtn.textContent = 'CAPTURE';
       capBtn.className = 'random-btn';
       capBtn.addEventListener('click', async () => {
-        const element = document.querySelector('.spread');
+        document.querySelectorAll('.draw-overlay').forEach(el => el.style.setProperty('opacity', '0', 'important'));
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        const element = document.querySelector('.spread-wrapper');
         try {
-          const canvas = await html2canvas(element);
+          const canvas = await html2canvas(element, { backgroundColor: null });
           canvas.toBlob((blob) => {
             autoDownload(blob);
-            // 5. captureBtn 클릭 시 알림 문구 개선
             alert('스프레드가 저장되었어요! 😊');
+            document.querySelectorAll('.draw-overlay').forEach(el => el.style.opacity = '');
           }, 'image/jpeg');
 
         } catch (err) {
           console.error(err);
           alert('캡처에 실패했어요… 콘솔을 확인해 주세요.');
+          document.querySelectorAll('.draw-overlay').forEach(el => el.style.opacity = '');
         }
       });
       capGroup.appendChild(capBtn);
@@ -370,7 +418,6 @@
   </script>
 
 <script>
-// 9. 모바일 다운로드 시 중복 파일 확인창 제거 (고유 파일명 생성)
 function autoDownload(imageBlob) {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(imageBlob);
@@ -411,7 +458,6 @@ onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(
 </div>
 
 <script>
-  // 4. JavaScript 전역 변수 및 함수 스코프 관리: 함수들 전역 스코프 유지
   function getCardName(imgId) {
     const img = document.getElementById(imgId);
     if (!img || !img.src) return "(선택되지 않음)";
@@ -426,7 +472,7 @@ onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(
       getCardName("img1"),
       getCardName("img2"),
       getCardName("img3"),
-      getCardName("img4") // 4번째 카드 추가
+      getCardName("img4")
     ];
 
     const promptText = `내 상황은 다음과 같아:\n${question}\n\n사용한 카드는 라이더 웨이트 덱이고, 뽑은 카드는 아래와 같아.\n- 통합 카드 1: ${cardNames[0]}\n- 통합 카드 2: ${cardNames[1]}\n- 통합 카드 3: ${cardNames[2]}\n- 보조 카드: ${cardNames[3]}\n\n이 카드들을 바탕으로 어떤 통합적 메시지를 줄 수 있을까? 자세히 해석해줘.`;
@@ -445,7 +491,6 @@ onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(
       alert("먼저 리딩 요청문을 생성해 주세요!");
       return;
     }
-    // 6. goToChatGPT 함수에 복사 성공 알림 추가
     navigator.clipboard.writeText(text).then(() => {
       alert("리딩 요청문이 복사되었습니다. ChatGPT로 이동합니다.");
       window.open("https://chat.openai.com", "_blank");
@@ -453,5 +498,4 @@ onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(
   }
 </script>
 </body>
-</html>
-
+</ht
