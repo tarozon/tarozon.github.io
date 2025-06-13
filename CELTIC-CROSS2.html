@@ -60,20 +60,25 @@
     }
     .spread {
       position: relative;
-      width: 1200px; /* 켈틱 크로스 레이아웃 크기 조정 */
-      height: 1000px; /* 켈틱 크로스 레이아웃 크기 조정 */
+      width: 1200px; 
+      height: 1000px; 
       margin-top: 20px;
     }
 
-    /* --- ✨ 1. 카드 뒤집기 기능 CSS 추가 --- */
+    /* --- ✨ 카드 뒤집기 CSS (3~10번 카드용) --- */
     .card-slot {
       width: 144px;
       height: 252px;
       position: absolute;
-      border: none;
-      background-color: transparent;
-      perspective: 1000px;
+      background-color: transparent; /* 뒤집기를 위해 배경 투명 처리 */
+      border: none; /* 뒤집기를 위해 테두리 제거 */
     }
+    /* 1, 2번 카드 원본 스타일 유지 */
+    #slot1, #slot2 {
+        border: 1px solid #ccc;
+        background-color: white;
+    }
+
     .flip-card-inner {
       position: relative;
       width: 100%;
@@ -108,17 +113,12 @@
     
     .draw-overlay {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
       background-color: rgba(0, 0, 0, 0.3);
       z-index: 10;
       cursor: pointer;
-      font-size: 1.2em; /* 폰트 크기 조정 */
       font-weight: bold;
       color: white;
       text-shadow: 1px 1px 3px black;
@@ -133,8 +133,8 @@
         pointer-events: none;
     }
     .draw-overlay .draw-button {
-        padding: 8px 16px; /* 패딩 조정 */
-        font-size: 1em; /* 폰트 크기 조정 */
+        padding: 8px 16px;
+        font-size: 1em;
         cursor: pointer;
         background-color: #ff77aa;
         color: white;
@@ -143,19 +143,22 @@
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         transition: background-color 0.2s, transform 0.2s;
     }
-    .draw-overlay .draw-button:hover {
-        background-color: #e66099;
-        transform: translateY(-2px);
-    }
 
     .card-slot img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      opacity: 1;
-      transform: rotate(0deg);
-      position: static;
-      z-index: auto;
+      opacity: 1; /* 모든 카드가 보이도록 기본 투명도 1로 변경 */
+    }
+    
+    /* 1, 2번 카드 원본 이미지 스타일 */
+    #slot1 img, #slot2 img {
+        object-fit: contain;
+        opacity: 0;
+        transition: opacity 2s ease, transform 0.5s ease;
+    }
+    #slot1 img.visible, #slot2 img.visible {
+        opacity: 1;
     }
     
     /* 켈틱 크로스 카드 위치 */
@@ -170,8 +173,7 @@
     #slot9 { top: 315px; left: 936px; }
     #slot10 { top: 43px; left: 936px; }
 
-
-    /* --- ✨ 2. mobile.css 충돌 해결을 위한 미디어 쿼리 추가 --- */
+    /* 모바일 환경 스타일 */
     @media only screen and (max-width: 768px) {
       .spread {
         position: static;
@@ -188,6 +190,9 @@
         background-color: transparent;
         flex-shrink: 0;
       }
+       #slot1, #slot2 { /* 모바일에서 1,2번 카드도 테두리 제거 */
+          border: none;
+       }
       .card-slot img {
         opacity: 1;
         transition: none;
@@ -203,30 +208,12 @@
   <h1>🃏 Tarot Celtic Cross Spread 🃏</h1>
   <div id="selectors"></div>
 <div class="spread-wrapper">
-  <div class="spread celtic-cross"> <!-- ✨ 클래스명 수정 -->
-    <!-- ✨ 3. 카드 뒤집기를 위한 HTML 구조로 전체 변경 -->
-    <div class="card-slot" id="slot1">
-      <div class="flip-card-inner">
-        <div class="flip-card-back">
-          <img src="/cards/card-back.jpg" class="card-back-image" alt="카드 뒷면">
-          <div class="draw-overlay" id="drawOverlay1">
-            <span class="position-text">현재 상황</span><button class="draw-button">DRAW</button>
-          </div>
-        </div>
-        <div class="flip-card-front"><img id="img1"/></div>
-      </div>
-    </div>
-    <div class="card-slot" id="slot2">
-        <div class="flip-card-inner">
-          <div class="flip-card-back">
-            <img src="/cards/card-back.jpg" class="card-back-image" alt="카드 뒷면">
-            <div class="draw-overlay" id="drawOverlay2">
-              <span class="position-text">장애 요소</span><button class="draw-button">DRAW</button>
-            </div>
-          </div>
-          <div class="flip-card-front"><img id="img2"/></div>
-        </div>
-      </div>
+  <div class="spread celtic-cross">
+    <!-- 카드 1, 2는 원본 구조 유지 -->
+    <div class="card-slot" id="slot1"><img id="img1" /></div>
+    <div class="card-slot" id="slot2"><img id="img2" /></div>
+
+    <!-- 카드 3~10은 새로운 뒤집기 구조 적용 -->
     <div class="card-slot" id="slot3">
         <div class="flip-card-inner">
           <div class="flip-card-back">
@@ -237,7 +224,7 @@
           </div>
           <div class="flip-card-front"><img id="img3"/></div>
         </div>
-      </div>
+    </div>
     <div class="card-slot" id="slot4">
         <div class="flip-card-inner">
           <div class="flip-card-back">
@@ -248,7 +235,7 @@
           </div>
           <div class="flip-card-front"><img id="img4"/></div>
         </div>
-      </div>
+    </div>
     <div class="card-slot" id="slot5">
         <div class="flip-card-inner">
           <div class="flip-card-back">
@@ -259,7 +246,7 @@
           </div>
           <div class="flip-card-front"><img id="img5"/></div>
         </div>
-      </div>
+    </div>
     <div class="card-slot" id="slot6">
         <div class="flip-card-inner">
           <div class="flip-card-back">
@@ -270,7 +257,7 @@
           </div>
           <div class="flip-card-front"><img id="img6"/></div>
         </div>
-      </div>
+    </div>
     <div class="card-slot" id="slot7">
         <div class="flip-card-inner">
           <div class="flip-card-back">
@@ -281,7 +268,7 @@
           </div>
           <div class="flip-card-front"><img id="img7"/></div>
         </div>
-      </div>
+    </div>
     <div class="card-slot" id="slot8">
         <div class="flip-card-inner">
           <div class="flip-card-back">
@@ -292,7 +279,7 @@
           </div>
           <div class="flip-card-front"><img id="img8"/></div>
         </div>
-      </div>
+    </div>
     <div class="card-slot" id="slot9">
         <div class="flip-card-inner">
           <div class="flip-card-back">
@@ -303,7 +290,7 @@
           </div>
           <div class="flip-card-front"><img id="img9"/></div>
         </div>
-      </div>
+    </div>
     <div class="card-slot" id="slot10">
         <div class="flip-card-inner">
           <div class="flip-card-back">
@@ -314,7 +301,7 @@
           </div>
           <div class="flip-card-front"><img id="img10"/></div>
         </div>
-      </div>
+    </div>
   </div>
 </div>
   <script>
@@ -365,7 +352,6 @@
           opt.text = idx < 22 ? `${code} ${name}` : name;
           select.appendChild(opt);
         });
-
         selects.push(select);
 
         const rndBtn = document.createElement('button');
@@ -387,14 +373,15 @@
         flipBtn.className = 'random-btn';
         flipBtn.addEventListener('click', () => {
           const img = document.getElementById(`img${i + 1}`);
-          const current = img.style.transform || (i === 1 ? 'rotate(90deg)' : 'rotate(0deg)');
+          const currentTransform = img.style.transform || '';
           let rotated;
 
-          if (i === 1) { // 2번 카드는 90도 회전
-            rotated = current.includes('90deg') ? 'rotate(270deg)' : 'rotate(90deg)';
+          if (i === 1) { // 2번 카드(장애물)
+            rotated = currentTransform.includes('90deg') ? 'rotate(270deg)' : 'rotate(90deg)';
           } else {
-            rotated = current.includes('180deg') ? 'rotate(0deg)' : 'rotate(180deg)';
+            rotated = currentTransform.includes('180deg') ? 'rotate(0deg)' : 'rotate(180deg)';
           }
+          img.style.transition = 'transform 0.5s ease';
           img.style.transform = rotated;
         });
 
@@ -403,49 +390,104 @@
         group.appendChild(flipBtn);
         selectorContainer.appendChild(group);
 
-        const drawOverlay = document.getElementById(`drawOverlay${i + 1}`);
-        if(drawOverlay) {
-            drawOverlay.querySelector('.draw-button').addEventListener('click', (e) => {
-                e.stopPropagation(); 
-                const used = selects.map((s,j)=> j===i?null:s.value).filter(v=>v);
-                const avail = cardList.map(c=>c[1]).filter(c=>!used.includes(c));
-                if (!avail.length) return;
-                const code = avail[Math.floor(Math.random()*avail.length)];
-                select.value = code;
-                select.dispatchEvent(new Event('change'));
+        if (i < 2) { // 카드 1, 2 원본 로직
+            select.addEventListener('change', function() {
+                const code = this.value;
+                const img = document.getElementById(`img${i+1}`);
+                const slot = document.getElementById(`slot${i+1}`);
+                const overlay = document.getElementById(`overlay${i+1}`);
+                if (code) {
+                    img.style.transition = 'none';
+                    const rot = (i === 1)
+                      ? ((Math.random() > 0.5) ? 'rotate(90deg)' : 'rotate(270deg)')
+                      : ((Math.random() > 0.5) ? 'rotate(180deg)' : 'rotate(0deg)');
+                    img.classList.remove("visible");
+                    img.src = `/cards/${code}.jpg`;
+                    
+                    if (i === 1) { // 2번 슬롯 자체를 회전
+                        slot.style.transform = 'rotate(90deg)';
+                        img.style.objectFit = 'cover'; // 가로 카드 잘림 방지
+                    } else {
+                        img.style.transform = rot;
+                    }
+                    
+                    setTimeout(() => {
+                      img.classList.add("visible");
+                      img.style.transition = 'opacity 2s ease, transform 0.5s ease';
+                    }, 50);
+                    if (overlay) overlay.classList.add("hidden");
+                } else {
+                    img.src = '';
+                    img.classList.remove("visible");
+                    if (i === 1) slot.style.transform = 'rotate(0deg)';
+                    if (overlay) overlay.classList.remove("hidden");
+                }
             });
-        }
-
-        // ✨ 4. JavaScript 이벤트 로직 수정
-        select.addEventListener('change', function () {
-            const code = this.value;
-            const img = document.getElementById(`img${i + 1}`);
+        } else { // 카드 3~10 새로운 뒤집기 로직
             const cardSlot = document.getElementById(`slot${i + 1}`);
+            const drawButton = cardSlot.querySelector('.draw-button');
+            
+            select.addEventListener('change', function () {
+                const code = this.value;
+                const img = document.getElementById(`img${i + 1}`);
 
-            if (code && cardSlot) {
-                // 2번 카드는 90도 또는 270도 회전, 나머지는 0도 또는 180도 회전
-                const rot = (i === 1)
-                  ? ((Math.random() > 0.5) ? 'rotate(90deg)' : 'rotate(270deg)')
-                  : ((Math.random() > 0.5) ? 'rotate(180deg)' : 'rotate(0deg)');
-                
-                img.src = `/cards/${code}.jpg`;
-                img.style.transform = rot; // 이미지 자체의 회전 적용
-                
-                if (i === 1) {
-                    // 2번 카드(가로 카드)는 뒤집기 애니메이션 없이 바로 표시
-                    cardSlot.style.transform = 'rotate(90deg)';
+                if (code) {
+                    const rot = (Math.random() > 0.5) ? 'rotate(180deg)' : 'rotate(0deg)';
+                    img.src = `/cards/${code}.jpg`;
+                    img.style.transform = rot;
+                    cardSlot.classList.add('is-flipped');
+                } else {
+                    img.src = '';
+                    cardSlot.classList.remove('is-flipped');
                 }
-                
-                cardSlot.classList.add('is-flipped');
-            } else if (cardSlot) {
-                img.src = '';
-                cardSlot.classList.remove('is-flipped');
-                 if (i === 1) {
-                    cardSlot.style.transform = 'rotate(0deg)'; // 원래대로
-                }
+            });
+
+            if (drawButton) {
+                drawButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    rndBtn.click();
+                });
             }
+        }
+      }
+      
+      // 카드 1, 2를 위한 오버레이만 동적 생성
+      for (let i = 0; i < 2; i++) {
+        const slot = document.getElementById(`slot${i+1}`);
+        const overlay = document.createElement('div');
+        overlay.id = `overlay${i+1}`;
+        overlay.style.position = 'absolute';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.display = 'flex';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.zIndex = '5';
+        overlay.style.cursor = 'pointer';
+        overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+        
+        const btn = document.createElement('button');
+        btn.textContent = 'DRAW';
+        btn.style.padding = '10px 20px';
+        btn.style.fontSize = '1.2em';
+        btn.style.backgroundColor = '#ff77aa';
+        btn.style.color = 'white';
+        btn.style.border = 'none';
+        btn.style.borderRadius = '8px';
+        
+        btn.addEventListener('click', () => selects[i].parentNode.querySelector('.random-btn').click());
+
+        overlay.appendChild(btn);
+        slot.appendChild(overlay);
+
+        selects[i].addEventListener('change', () => {
+            if(selects[i].value) overlay.style.display = 'none';
+            else overlay.style.display = 'flex';
         });
       }
+
 
       const allGroup = document.createElement('div');
       allGroup.className = 'selector-group';
@@ -481,7 +523,7 @@
       capBtn.textContent = 'CAPTURE';
       capBtn.className = 'random-btn';
       capBtn.addEventListener('click', async () => {
-        document.querySelectorAll('.draw-overlay').forEach(el => el.style.setProperty('opacity', '0', 'important'));
+        document.querySelectorAll('.draw-overlay, #overlay1, #overlay2').forEach(el => el.style.setProperty('display', 'none', 'important'));
         
         await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -491,13 +533,15 @@
           canvas.toBlob((blob) => {
             autoDownload(blob);
             alert('스프레드가 저장되었어요! 😊');
-            document.querySelectorAll('.draw-overlay').forEach(el => el.style.opacity = '');
+            document.querySelectorAll('.draw-overlay').forEach(el => el.style.display = '');
+            document.querySelectorAll('#overlay1, #overlay2').forEach(el => el.style.display = '');
           }, 'image/jpeg');
 
         } catch (err) {
           console.error(err);
           alert('캡처에 실패했어요… 콘솔을 확인해 주세요.');
-          document.querySelectorAll('.draw-overlay').forEach(el => el.style.opacity = '');
+           document.querySelectorAll('.draw-overlay').forEach(el => el.style.display = '');
+           document.querySelectorAll('#overlay1, #overlay2').forEach(el => el.style.display = '');
         }
       });
       capGroup.appendChild(capBtn);
@@ -611,4 +655,4 @@ onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(
   }
 </script>
 </body>
-</ht
+</html>
