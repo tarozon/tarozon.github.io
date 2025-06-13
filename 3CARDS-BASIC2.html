@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/mobile.css" media="only screen and (max-width: 768px)">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
     * {
@@ -28,6 +29,7 @@
       align-items: center;
       background-color: #fdf6e3;
       padding: 20px;
+      min-width: 320px; /* 최소 너비 지정으로 레이아웃 깨짐 방지 */
     }
     h1 {
       margin-top: 20px;
@@ -53,29 +55,40 @@
     select {
       width: 160px;
     }
-    /* spread-wrapper는 캡처 영역을 시각적으로 감싸는 역할만 합니다. */
+
+    /* --- ✨ [수정 1] 카드 컨테이너(spread) 설정 변경 --- */
     .spread-wrapper {
         width: 100%;
+        max-width: 900px; /* 카드가 너무 커지는 것을 방지 */
         display: flex;
         justify-content: center;
         margin-top: 20px;
     }
-    /* 실제 카드들이 담기는 컨테이너입니다. */
     .spread {
       display: flex;
       justify-content: center;
-      gap: 20px; /* 카드 간격을 약간 줄여 모바일에서 잘 보이도록 조정 */
-      padding: 20px; /* 캡처 시 여백을 주기 위해 추가 */
-      flex-wrap: wrap; /* 화면이 작을 때 카드가 아래로 내려가도록 설정 */
+      align-items: center;
+      width: 100%;
+      /* 기존 gap: 40px 대신 화면 너비에 반응하는 유연한 간격 설정 */
+      gap: 2.5vw;
+      margin-top: 20px;
     }
 
+    /* --- ✨ [수정 2] 카드 슬롯(card-slot) 크기를 반응형으로 변경 --- */
     .card-slot {
-      width: 144px;
-      height: 252px;
+      /* 고정 px 너비 대신 %와 max-width를 사용해 유연하게 조절 */
+      width: 30%;
+      max-width: 144px; /* 카드의 최대 너비는 144px로 제한 */
+
+      /* height 대신 aspect-ratio를 사용해 카드 비율(144:252)을 유지 */
+      aspect-ratio: 144 / 252;
+
       border: none;
       background-color: transparent;
       perspective: 1000px;
     }
+
+    /* --- 카드 뒤집기 기능 CSS (이하 변경 없음) --- */
     .flip-card-inner {
       position: relative;
       width: 100%;
@@ -170,9 +183,17 @@
         opacity: 1;
         transition: none;
       }
+      /* 모바일에서 오버레이 텍스트/버튼 크기 조절 */
+      .draw-overlay {
+        font-size: 2.5vw;
+        gap: 1.5vw;
+      }
+      .draw-overlay .draw-button {
+        font-size: 2.2vw;
+        padding: 8px 10px;
+      }
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -228,6 +249,7 @@
     </div>
   </div>
   <script>
+    // JavaScript는 변경할 필요가 없으므로 그대로 사용합니다.
     const positions = ["과거", "현재", "미래"];
     const cardList = [
       ["The Fool","00"],["The Magician","01"],["The High Priestess","02"],["The Empress","03"],
@@ -366,16 +388,12 @@
         
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        // --- ✨ 캡처 기능 수정 ✨ ---
-        // 캡처 대상을 .spread-wrapper에서 카드 전체를 감싸는 .spread로 변경합니다.
-        const element = document.querySelector('.spread');
+        const element = document.querySelector('.spread-wrapper');
         try {
-          // html2canvas 옵션에 배경색을 명시적으로 지정해줍니다.
-          const canvas = await html2canvas(element, { backgroundColor: '#fdf6e3' });
+          const canvas = await html2canvas(element, { backgroundColor: null });
           canvas.toBlob((blob) => {
             autoDownload(blob);
             alert('스프레드가 저장되었어요! 😊');
-            // 캡처 후 다시 오버레이를 보이게 합니다.
             document.querySelectorAll('.draw-overlay').forEach(el => el.style.opacity = '');
           }, 'image/jpeg');
 
