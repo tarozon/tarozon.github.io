@@ -65,33 +65,28 @@
     width: 160px;
   }
 
-  /* --- 1. 카드 전체 배치 컨테이너 --- */
-  .spread-wrapper {
-    width: 100%;
-    padding: 0 10px;
-  }
+.spread-wrapper {
+  width: 100%;
+  padding: 0;
+}
 
-  .spread {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 4%;
-    margin-top: 20px;
-    width: 100%;
-    flex-wrap: nowrap;
-    overflow-x: auto; /* 혹시라도 작아지면 스크롤 허용 */
-  }
+.spread {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
 
-  /* --- 2. 카드 슬롯 (비율 유지) --- */
-  .card-slot {
-    width: 28%;
-    max-width: 144px;
-    aspect-ratio: 144 / 252;
-    border: none;
-    background-color: transparent;
-    perspective: 1000px;
-    flex-shrink: 0; /* 스크롤 시 비율 왜곡 방지 */
-  }
+.card-slot {
+  width: calc((100% - 32px) / 3); /* 3카드 + gap 2개 */
+  max-width: 144px;
+  aspect-ratio: 144 / 252;
+  flex-shrink: 0;
+}
+
 
   .flip-card-inner {
     position: relative;
