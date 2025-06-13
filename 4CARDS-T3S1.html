@@ -53,21 +53,32 @@
     select {
       width: 160px;
     }
+    .spread-wrapper {
+      width: 100%;
+      max-width: 800px;
+    }
+    
+    /* [수정 1] 카드 크기 및 배열 문제 해결 */
     .spread {
       display: flex;
       justify-content: center;
-      gap: 40px;
+      /* flex-wrap을 제거하여 절대 줄바꿈이 일어나지 않도록 함 */
+      gap: 1.5vw; /* 4카드에 맞게 간격을 조금 줄임 */
       margin-top: 20px;
+      width: 100%;
     }
-
-    /* --- ✨ 1. 카드 뒤집기 기능 CSS 추가 --- */
     .card-slot {
-      width: 144px;
-      height: 252px;
+      /* 4개의 카드가 한 줄에 들어오도록 너비 재계산 (22% * 4 + 간격) */
+      width: 22%; 
+      max-width: 144px;
+      height: auto;
+      aspect-ratio: 144 / 252;
+      
       border: none;
       background-color: transparent;
       perspective: 1000px;
     }
+    
     .flip-card-inner {
       position: relative;
       width: 100%;
@@ -112,7 +123,7 @@
       background-color: rgba(0, 0, 0, 0.3);
       z-index: 10;
       cursor: pointer;
-      font-size: 1.5em;
+      font-size: 1.2em; /* 4카드이므로 폰트를 살짝 줄임 */
       font-weight: bold;
       color: white;
       text-shadow: 1px 1px 3px black;
@@ -127,8 +138,8 @@
         pointer-events: none;
     }
     .draw-overlay .draw-button {
-        padding: 10px 20px;
-        font-size: 1.2em;
+        padding: 8px 16px; /* 4카드이므로 버튼을 살짝 줄임 */
+        font-size: 1em;
         cursor: pointer;
         background-color: #ff77aa;
         color: white;
@@ -152,18 +163,8 @@
       z-index: auto;
     }
     
-    /* --- ✨ 2. mobile.css 충돌 해결을 위한 미디어 쿼리 추가 --- */
-    @media only screen and (max-width: 768px) {
-      .card-slot {
-        display: block;
-        border: none;
-        background-color: transparent;
-      }
-      .card-slot img {
-        opacity: 1;
-        transition: none;
-      }
-    }
+    /* 문제가 되었던 모바일 강제 줄바꿈 코드를 완전히 제거 */
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
@@ -175,7 +176,6 @@
   <div id="selectors"></div>
 <div class="spread-wrapper">
   <div class="spread">
-    <!-- ✨ 3. 카드 뒤집기를 위한 HTML 구조 변경 -->
     <div class="card-slot" id="cardSlot1">
       <div class="flip-card-inner">
         <div class="flip-card-back">
@@ -325,18 +325,18 @@
             });
         }
 
-        // ✨ 4. JavaScript 이벤트 로직 수정
+        // [수정 2] 카드 뒤집기 로직 문제 해결
         select.addEventListener('change', function () {
             const code = this.value;
             const img = document.getElementById(`img${i + 1}`);
             const cardSlot = document.getElementById(`cardSlot${i + 1}`);
 
-            if (code) {
+            if (code && cardSlot) {
                 const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)';
                 img.src = `/cards/${code}.jpg`;
-                img.style.transform = rot; 
+                img.style.transform = rot;
                 cardSlot.classList.add('is-flipped');
-            } else {
+            } else if (cardSlot) {
                 img.src = '';
                 cardSlot.classList.remove('is-flipped');
             }
@@ -498,4 +498,4 @@ onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 6px rgba(
   }
 </script>
 </body>
-</ht
+</html>
