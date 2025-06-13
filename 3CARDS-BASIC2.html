@@ -16,7 +16,13 @@
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
   <style>
+    /* ✨✨✨ 이 한 줄이 모든 문제의 해결책입니다 ✨✨✨ */
     * {
+      box-sizing: border-box; /* 너비 계산 시, padding과 border를 너비에 포함시킴 */
+    }
+
+    /* --- 이하 기존 코드 (box-sizing과 함께 정상 작동) --- */
+    *, *::before, *::after {
       -webkit-user-select: none;
       -ms-user-select: none;
       user-select: none;
@@ -54,35 +60,31 @@
       width: 160px;
     }
 
-    /* --- ✨ 1. 레이아웃 컨테이너 설정 (단순 Flex 방식으로 복귀) --- */
+    /* --- 1. 레이아웃 컨테이너 설정 --- */
     .spread-wrapper {
         width: 100%;
-        padding: 0 10px; /* 모바일에서 좌우 여백 확보 */
+        padding: 0 10px;
     }
     .spread {
       display: flex;
       justify-content: center;
-      align-items: center; /* 카드들을 세로 중앙 정렬 */
-      gap: 4%; /* 고정값이 아닌 %로 간격 설정 */
+      align-items: center;
+      gap: 4%;
       margin-top: 20px;
       width: 100%;
     }
 
-    /* --- ✨ 2. 카드 슬롯을 반응형으로 변경 --- */
+    /* --- 2. 카드 슬롯을 반응형으로 변경 --- */
     .card-slot {
-      /* 고정 크기 대신 % 너비와 최대 크기 지정 */
       width: 30%;
-      max-width: 144px; /* 카드가 너무 커지는 것을 방지 */
-      /* 카드의 가로:세로 비율(144:252)을 유지 */
+      max-width: 144px;
       aspect-ratio: 144 / 252;
-      
-      /* 기존 속성 유지 */
       border: none;
       background-color: transparent;
       perspective: 1000px;
     }
 
-    /* --- ✨ 3. 카드 뒤집기 및 내부 UI 스타일 (변경 없음) --- */
+    /* --- 3. 카드 뒤집기 및 내부 UI 스타일 --- */
     .flip-card-inner {
       position: relative;
       width: 100%;
@@ -172,7 +174,7 @@
       z-index: auto;
     }
 
-    /* --- ✨ 4. 모바일 반응형 폰트 크기 조절 --- */
+    /* --- 4. 모바일 반응형 폰트 크기 조절 --- */
     @media (max-width: 768px) {
       .draw-overlay {
         font-size: 4vw;
