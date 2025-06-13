@@ -14,10 +14,8 @@
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/mobile.css" media="only screen and (max-width: 768px)">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
-    /* 기본 스타일 */
     * {
       -webkit-user-select: none;
       -ms-user-select: none;
@@ -56,47 +54,42 @@
       width: 160px;
     }
 
-    /* --- ✨ [최종 수정] 수학적 계산으로 완벽한 비율의 레이아웃 구현 --- */
-
-    /* 1. 레이아웃 컨테이너 설정 */
+    /* --- ✨ 1. 레이아웃 컨테이너 설정 --- */
     .spread-wrapper {
         width: 100%;
-        max-width: 800px;
+        max-width: 600px; /* 3카드에 적합한 최대 너비로 조정 */
         display: flex;
         justify-content: center;
         margin-top: 20px;
     }
     .spread {
-      position: relative !important;
-      display: block !important;
-      width: 100%;
-      /* 3카드 배열에 적합한 가로가 넓은 비율로 설정 (10:4 = 2.5) */
-      aspect-ratio: 10 / 4; 
+        position: relative !important;
+        display: block !important;
+        width: 100%;
+        /* 컨테이너 비율을 카드 높이에 맞게 설정 (가로:세로 = 600:252) */
+        aspect-ratio: 600 / 252;
     }
-    
-    /* 2. 카드 슬롯의 비율을 수학적으로 계산하여 설정 */
+
+    /* --- ✨ 2. 카드 슬롯 설정 --- */
     .card-slot {
       position: absolute !important;
-      /*
-        위의 spread 비율(10:4)과 타로카드 비율(144:252)을
-        방정식으로 계산하여 도출된 정확한 수치입니다.
-        이제 이 컨테이너 자체가 항상 완벽한 타로카드 비율을 가집니다.
-      */
-      width: 20.6%; 
-      height: 90%; 
+      /* 카드의 크기를 % 단위로 변경 */
+      width: 30%; /* 3개의 카드가 적절한 간격을 갖도록 너비 설정 */
+      height: 100%;
+      bottom: 0; /* 모든 카드를 컨테이너 하단에 정렬 */
       border: none;
       background-color: transparent;
       perspective: 1000px;
     }
 
-    /* 3. 카드 3개의 위치 지정 */
-    #cardSlot1 { top: 5%; left: 13%; }
-    #cardSlot2 { top: 5%; left: 50%; transform: translateX(-50%); }
-    #cardSlot3 { top: 5%; right: 13%; }
+    /* --- ✨ 3. 카드 위치를 % 단위로 재설정 --- */
+    /* id가 slot이 아닌 cardSlot으로 되어 있어 수정합니다. */
+    #cardSlot1 { left: 2.5%; }
+    #cardSlot2 { left: 50%; transform: translateX(-50%); }
+    #cardSlot3 { right: 2.5%; }
 
 
-    /* --- 이하 카드 뒤집기 및 이미지 관련 CSS --- */
-    /* object-fit: cover는 이제 정상적으로 작동합니다 */
+    /* --- ✨ 4. 카드 뒤집기 및 내부 UI 스타일 (대부분 변경 없음) --- */
     .flip-card-inner {
       position: relative;
       width: 100%;
@@ -123,10 +116,10 @@
     .flip-card-back {
       background-color: #fff;
     }
-    .card-back-image, .card-slot img {
+    .card-back-image {
         width: 100%;
         height: 100%;
-        object-fit: cover; 
+        object-fit: cover;
     }
     
     .draw-overlay {
@@ -141,23 +134,24 @@
       background-color: rgba(0, 0, 0, 0.3);
       z-index: 10;
       cursor: pointer;
+      font-size: 1.5em;
       font-weight: bold;
       color: white;
       text-shadow: 1px 1px 3px black;
       text-align: center;
       flex-direction: column;
-      gap: 1.5vw;
+      gap: 10px;
       opacity: 1;
       transition: opacity 0.5s;
       overflow: hidden;
-      font-size: 2vw;
     }
     .card-slot.is-flipped .draw-overlay {
         opacity: 0;
         pointer-events: none;
     }
     .draw-overlay .draw-button {
-        padding: 1vw 1.5vw;
+        padding: 10px 20px;
+        font-size: 1.2em;
         cursor: pointer;
         background-color: #ff77aa;
         color: white;
@@ -169,17 +163,46 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        font-size: 1.8vw;
     }
-     .draw-overlay .draw-button:hover {
+    .draw-overlay .draw-button:hover {
         background-color: #e66099;
         transform: translateY(-2px);
     }
-    @media (max-width: 500px) {
-      .draw-overlay { font-size: 10px; gap: 5px; }
-      .draw-overlay .draw-button { font-size: 9px; padding: 5px 8px; }
+
+    .card-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 1;
+      transform: rotate(0deg);
+      position: static;
+      z-index: auto;
     }
-  </style>
+
+    /* --- ✨ 5. 모바일 반응형 폰트 크기 조절 --- */
+    @media (max-width: 768px) {
+      .draw-overlay {
+        font-size: 4vw; /* 3카드 배열은 카드가 비교적 크므로 폰트를 조금 더 키웁니다 */
+        gap: 5px;
+      }
+
+      .draw-overlay .draw-button {
+        font-size: 3.5vw;
+        padding: 8px 10px;
+        border-radius: 6px;
+      }
+    }
+    @media (max-width: 400px) {
+      .draw-overlay {
+        font-size: 12px;
+      }
+      .draw-overlay .draw-button {
+        font-size: 11px;
+        padding: 5px 8px;
+      }
+    }
+</style>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
 
@@ -190,6 +213,7 @@
   <div id="selectors"></div>
   <div class="spread-wrapper">
     <div class="spread">
+      <!-- ✨ 3. 카드 뒤집기를 위한 HTML 구조 변경 -->
       <div class="card-slot" id="cardSlot1">
         <div class="flip-card-inner">
           <div class="flip-card-back">
@@ -321,6 +345,7 @@
             select.dispatchEvent(new Event('change'));
         });
 
+        // ✨ 4. JavaScript 이벤트 로직 수정
         select.addEventListener('change', function () {
             const code = this.value;
             const img = document.getElementById(`img${i + 1}`);
@@ -392,7 +417,8 @@
       selectorContainer.appendChild(capGroup);
     };
   </script>
-  
+
+  <!-- 나머지 스크립트와 GPT 연동 섹션은 그대로 유지 -->
   <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
     document.addEventListener('keydown', function (e) {
