@@ -17,6 +17,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
+    /* 기본 스타일 (변경 없음) */
     * {
       -webkit-user-select: none;
       -ms-user-select: none;
@@ -29,7 +30,6 @@
       align-items: center;
       background-color: #fdf6e3;
       padding: 20px;
-      min-width: 320px;
     }
     h1 {
       margin-top: 20px;
@@ -55,29 +55,43 @@
     select {
       width: 160px;
     }
+
+    /* --- ✨ [수정] 요청하신 '말편자 배열법'과 동일한 레이아웃 방식으로 변경 --- */
+
+    /* 1. 레이아웃 컨테이너 설정 */
     .spread-wrapper {
         width: 100%;
-        max-width: 900px;
+        max-width: 800px; /* 최대 너비 설정 */
         display: flex;
         justify-content: center;
         margin-top: 20px;
     }
     .spread {
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      position: relative !important; /* 자식 요소의 absolute 위치 기준점 */
+      display: block !important;
       width: 100%;
-      gap: 2.5vw;
-      margin-top: 20px;
+      /* 3카드 가로 배열에 적합한 가로:세로 비율 설정 */
+      aspect-ratio: 10 / 4; 
     }
+    
+    /* 2. 카드 슬롯을 % 크기와 절대 위치로 설정 */
     .card-slot {
-      width: 30%;
-      max-width: 144px;
-      aspect-ratio: 144 / 252;
+      position: absolute !important;
+      /* spread 컨테이너 비율에 맞춰 카드 크기 설정 */
+      width: 25%; 
+      height: 90%; 
       border: none;
       background-color: transparent;
       perspective: 1000px;
     }
+
+    /* 3. 카드 3개의 위치를 각각 지정 */
+    #cardSlot1 { top: 5%; left: 8%; }
+    #cardSlot2 { top: 5%; left: 50%; transform: translateX(-50%); }
+    #cardSlot3 { top: 5%; right: 8%; }
+
+
+    /* --- 이하 카드 뒤집기 및 이미지 관련 CSS (기존 코드와 동일) --- */
     .flip-card-inner {
       position: relative;
       width: 100%;
@@ -104,15 +118,21 @@
     .flip-card-back {
       background-color: #fff;
     }
-
-    /* --- ✨ [수정] 카드 잘림 현상 해결 --- */
     .card-back-image {
         width: 100%;
         height: 100%;
-        /* cover -> fill 로 변경하여 이미지가 컨테이너에 꽉 차도록 설정 */
-        object-fit: fill; 
+        object-fit: cover; /* 예시 코드와 동일하게 cover 유지 */
     }
-    
+    .card-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* 예시 코드와 동일하게 cover 유지 */
+      opacity: 1;
+      transform: rotate(0deg);
+      position: static;
+      z-index: auto;
+    }
+
     .draw-overlay {
       position: absolute;
       top: 0;
@@ -125,7 +145,6 @@
       background-color: rgba(0, 0, 0, 0.3);
       z-index: 10;
       cursor: pointer;
-      font-size: 1.5em;
       font-weight: bold;
       color: white;
       text-shadow: 1px 1px 3px black;
@@ -134,14 +153,16 @@
       gap: 10px;
       opacity: 1;
       transition: opacity 0.5s;
+      overflow: hidden;
+      /* 카드 크기가 작아지므로 폰트 크기도 반응형으로 조절 */
+      font-size: 2vw;
     }
     .card-slot.is-flipped .draw-overlay {
         opacity: 0;
         pointer-events: none;
     }
     .draw-overlay .draw-button {
-        padding: 10px 20px;
-        font-size: 1.2em;
+        padding: 5px 10px;
         cursor: pointer;
         background-color: #ff77aa;
         color: white;
@@ -149,42 +170,21 @@
         border-radius: 8px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         transition: background-color 0.2s, transform 0.2s;
+        max-width: 90%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 1.8vw;
     }
-    .draw-overlay .draw-button:hover {
+     .draw-overlay .draw-button:hover {
         background-color: #e66099;
         transform: translateY(-2px);
     }
 
-    /* --- ✨ [수정] 카드 잘림 현상 해결 --- */
-    .card-slot img {
-      width: 100%;
-      height: 100%;
-      /* cover -> fill 로 변경하여 이미지가 컨테이너에 꽉 차도록 설정 */
-      object-fit: fill; 
-      opacity: 1;
-      transform: rotate(0deg);
-      position: static;
-      z-index: auto;
-    }
-    
-    @media only screen and (max-width: 768px) {
-      .card-slot {
-        display: block;
-        border: none;
-        background-color: transparent;
-      }
-      .card-slot img {
-        opacity: 1;
-        transition: none;
-      }
-      .draw-overlay {
-        font-size: 2.5vw;
-        gap: 1.5vw;
-      }
-      .draw-overlay .draw-button {
-        font-size: 2.2vw;
-        padding: 8px 10px;
-      }
+    /* 화면이 아주 작을 때 최소 폰트 크기 보장 */
+    @media (max-width: 500px) {
+      .draw-overlay { font-size: 10px; }
+      .draw-overlay .draw-button { font-size: 9px; }
     }
   </style>
 </head>
@@ -399,7 +399,7 @@
       selectorContainer.appendChild(capGroup);
     };
   </script>
-
+  
   <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
     document.addEventListener('keydown', function (e) {
