@@ -16,12 +16,8 @@
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
   <style>
-  /* ✨ 핵심 설정 */
   * {
     box-sizing: border-box;
-  }
-
-  *, *::before, *::after {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
@@ -65,28 +61,31 @@
     width: 160px;
   }
 
-.spread-wrapper {
-  width: 100%;
-  padding: 0;
-}
+  /* 📌 카드 컨테이너 */
+  .spread-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    padding: 0;
+  }
 
-.spread {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-}
+  .spread {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    width: max-content;
+    margin-top: 20px;
+  }
 
-.card-slot {
-  width: calc((100% - 32px) / 3); /* 3카드 + gap 2개 */
-  max-width: 144px;
-  aspect-ratio: 144 / 252;
-  flex-shrink: 0;
-}
-
+  .card-slot {
+    width: calc((100vw - 64px) / 3);
+    max-width: 144px;
+    aspect-ratio: 144 / 252;
+    border: none;
+    background-color: transparent;
+    perspective: 1000px;
+    flex-shrink: 0;
+  }
 
   .flip-card-inner {
     position: relative;
@@ -123,6 +122,16 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  .card-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 1;
+    transform: rotate(0deg);
+    position: static;
+    z-index: auto;
   }
 
   .draw-overlay {
@@ -175,18 +184,13 @@
     transform: translateY(-2px);
   }
 
-  .card-slot img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 1;
-    transform: rotate(0deg);
-    position: static;
-    z-index: auto;
-  }
-
-  /* --- 3. 모바일 대응 (폰트 조절 등) --- */
+  /* 모바일 대응 */
   @media (max-width: 768px) {
+    .card-slot {
+      width: 30%;
+      max-width: none;
+    }
+
     .draw-overlay {
       font-size: 4vw;
       gap: 5px;
@@ -196,11 +200,6 @@
       font-size: 3.5vw;
       padding: 8px 10px;
       border-radius: 6px;
-    }
-
-    .card-slot {
-      width: 30%;
-      max-width: none;
     }
   }
 
@@ -216,6 +215,243 @@
   }
 </style>
 
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body>
+
+  <a href="/" class="home-button">🏠 홈</a>
+  <a href="http://pf.kakao.com/_NgxjJn/chat" class="reading-button">1:1 채팅 상담</a>
+
+  <h1>🃏 3-Card Spread (과거 - 현재 - 미래) 🃏</h1>
+  <div id="selectors"></div>
+  <div class="spread-wrapper">
+    <div class="spread">
+      <!-- ✨ 3. 카드 뒤집기를 위한 HTML 구조 변경 -->
+      <div class="card-slot" id="cardSlot1">
+        <div class="flip-card-inner">
+          <div class="flip-card-back">
+            <img src="/cards/card-back.jpg" class="card-back-image" alt="카드 뒷면">
+            <div class="draw-overlay" id="drawOverlay1">
+                <span class="position-text">과거</span>
+                <button class="draw-button">DRAW</button>
+            </div>
+          </div>
+          <div class="flip-card-front">
+            <img id="img1" />
+          </div>
+        </div>
+      </div>
+      <div class="card-slot" id="cardSlot2">
+        <div class="flip-card-inner">
+          <div class="flip-card-back">
+            <img src="/cards/card-back.jpg" class="card-back-image" alt="카드 뒷면">
+            <div class="draw-overlay" id="drawOverlay2">
+                <span class="position-text">현재</span>
+                <button class="draw-button">DRAW</button>
+            </div>
+          </div>
+          <div class="flip-card-front">
+            <img id="img2" />
+          </div>
+        </div>
+      </div>
+      <div class="card-slot" id="cardSlot3">
+        <div class="flip-card-inner">
+          <div class="flip-card-back">
+            <img src="/cards/card-back.jpg" class="card-back-image" alt="카드 뒷면">
+            <div class="draw-overlay" id="drawOverlay3">
+                <span class="position-text">미래</span>
+                <button class="draw-button">DRAW</button>
+            </div>
+          </div>
+          <div class="flip-card-front">
+            <img id="img3" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const positions = ["과거", "현재", "미래"];
+    const cardList = [
+      ["The Fool","00"],["The Magician","01"],["The High Priestess","02"],["The Empress","03"],
+      ["The Emperor","04"],["The Hierophant","05"],["The Lovers","06"],["The Chariot","07"],
+      ["Strength","08"],["The Hermit","09"],["The Wheel of Fortune","10"],["Justice","11"],
+      ["The Hanged Man","12"],["Death","13"],["Temperance","14"],["The Devil","15"],
+      ["The Tower","16"],["The Star","17"],["The Moon","18"],["The Sun","19"],
+      ["Judgement","20"],["The World","21"],["King of Pentacles","22"],["Queen of Pentacles","23"],
+      ["Knight of Pentacles","24"],["Page of Pentacles","25"],["Ace of Pentacles","26"],["Two of Pentacles","27"],
+      ["Three of Pentacles","28"],["Four of Pentacles","29"],["Five of Pentacles","30"],["Six of Pentacles","31"],
+      ["Seven of Pentacles","32"],["Eight of Pentacles","33"],["Nine of Pentacles","34"],["Ten of Pentacles","35"],
+      ["King of Cups","36"],["Queen of Cups","37"],["Knight of Cups","38"],["Page of Cups","39"],
+      ["Ace of Cups","40"],["Two of Cups","41"],["Three of Cups","42"],["Four of Cups","43"],
+      ["Five of Cups","44"],["Six of Cups","45"],["Seven of Cups","46"],["Eight of Cups","47"],
+      ["Nine of Cups","48"],["Ten of Cups","49"],["King of Swords","50"],["Queen of Swords","51"],
+      ["Knight of Swords","52"],["Page of Swords","53"],["Ace of Swords","54"],["Two of Swords","55"],
+      ["Three of Swords","56"],["Four of Swords","57"],["Five of Swords","58"],["Six of Swords","59"],
+      ["Seven of Swords","60"],["Eight of Swords","61"],["Nine of Swords","62"],["Ten of Swords","63"],
+      ["King of Wands","64"],["Queen of Wands","65"],["Knight of Wands","66"],["Page of Wands","67"],
+      ["Ace of Wands","68"],["Two of Wands","69"],["Three of Wands","70"],["Four of Wands","71"],
+      ["Five of Wands","72"],["Six of Wands","73"],["Seven of Wands","74"],["Eight of Wands","75"],
+      ["Nine of Wands","76"],["Ten of Wands","77"]
+    ];
+
+    window.onload = () => {
+      const selectorContainer = document.getElementById('selectors');
+      const selects = [];
+
+      for (let i = 0; i < 3; i++) {
+        const group = document.createElement('div');
+        group.className = 'selector-group';
+
+        const select = document.createElement('select');
+        const defaultOpt = document.createElement('option');
+        defaultOpt.value = '';
+        defaultOpt.text = `${i + 1}. ${positions[i]}`;
+        select.appendChild(defaultOpt);
+        cardList.forEach(([name, code], idx) => {
+          const opt = document.createElement('option');
+          opt.value = code;
+          opt.text = idx < 22 ? `${code} ${name}` : name;
+          select.appendChild(opt);
+        });
+
+        selects.push(select);
+
+        const rndBtn = document.createElement('button');
+        rndBtn.type = 'button';
+        rndBtn.textContent = 'DRAW';
+        rndBtn.className = 'random-btn';
+        rndBtn.addEventListener('click', () => {
+          const used = selects.map((s,j)=> j===i?null:s.value).filter(v=>v);
+          const avail = cardList.map(c=>c[1]).filter(c=>!used.includes(c));
+          if (!avail.length) return;
+          const code = avail[Math.floor(Math.random()*avail.length)];
+          select.value = code;
+          select.dispatchEvent(new Event('change'));
+        });
+
+        const flipBtn = document.createElement('button');
+        flipBtn.type = 'button';
+        flipBtn.textContent = 'FLIP';
+        flipBtn.className = 'random-btn';
+        flipBtn.addEventListener('click', () => {
+          const img = document.getElementById(`img${i + 1}`);
+          const current = img.style.transform || 'rotate(0deg)';
+          const rotated = current.includes('180deg') ? 'rotate(0deg)' : 'rotate(180deg)';
+          img.style.transform = rotated;
+        });
+
+        group.appendChild(select);
+        group.appendChild(rndBtn);
+        group.appendChild(flipBtn);
+        selectorContainer.appendChild(group);
+
+        const drawOverlay = document.getElementById(`drawOverlay${i + 1}`);
+        drawOverlay.querySelector('.draw-button').addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            const used = selects.map((s,j)=> j===i?null:s.value).filter(v=>v);
+            const avail = cardList.map(c=>c[1]).filter(c=>!used.includes(c));
+            if (!avail.length) return;
+            const code = avail[Math.floor(Math.random()*avail.length)];
+            select.value = code;
+            select.dispatchEvent(new Event('change'));
+        });
+
+        // ✨ 4. JavaScript 이벤트 로직 수정
+        select.addEventListener('change', function () {
+            const code = this.value;
+            const img = document.getElementById(`img${i + 1}`);
+            const cardSlot = document.getElementById(`cardSlot${i + 1}`);
+
+            if (code) {
+                const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)';
+                img.src = `/cards/${code}.jpg`;
+                img.style.transform = rot; 
+                cardSlot.classList.add('is-flipped');
+            } else {
+                img.src = '';
+                cardSlot.classList.remove('is-flipped');
+            }
+        });
+      }
+
+      const allGroup = document.createElement('div');
+      allGroup.className = 'selector-group';
+      const allBtn = document.createElement('button');
+      allBtn.id = 'allRandomBtn';
+      allBtn.textContent = 'DRAW ALL';
+      allBtn.className = 'random-btn';
+      allBtn.addEventListener('click', () => {
+        const codes = cardList.map(c=>c[1]);
+        const shuffled = codes.sort(()=>Math.random()-0.5);
+        selects.forEach((sel,j)=>{ sel.value=shuffled[j]; sel.dispatchEvent(new Event('change')); });
+      });
+      allGroup.appendChild(allBtn);
+      selectorContainer.appendChild(allGroup);
+
+      const shGroup = document.createElement('div');
+      shGroup.className = 'selector-group';
+      const shBtn = document.createElement('button');
+      shBtn.id = 'shuffleBtn';
+      shBtn.textContent = 'New Spread';
+      shBtn.className = 'random-btn';
+      shBtn.addEventListener('click', () => location.reload());
+      shGroup.appendChild(shBtn);
+      selectorContainer.appendChild(shGroup);
+
+      const capGroup = document.createElement('div');
+      capGroup.className = 'selector-group';
+      const capBtn = document.createElement('button');
+      capBtn.id = 'captureBtn';
+      capBtn.textContent = 'CAPTURE';
+      capBtn.className = 'random-btn';
+      capBtn.addEventListener('click', async () => {
+        document.querySelectorAll('.draw-overlay').forEach(el => el.style.setProperty('opacity', '0', 'important'));
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        const element = document.querySelector('.spread-wrapper');
+        try {
+          const canvas = await html2canvas(element, { backgroundColor: null });
+          canvas.toBlob((blob) => {
+            autoDownload(blob);
+            alert('스프레드가 저장되었어요! 😊');
+            document.querySelectorAll('.draw-overlay').forEach(el => el.style.opacity = '');
+          }, 'image/jpeg');
+
+        } catch (err) {
+          console.error(err);
+          alert('캡처에 실패했어요… 콘솔을 확인해 주세요.');
+          document.querySelectorAll('.draw-overlay').forEach(el => el.style.opacity = '');
+        }
+      });
+      capGroup.appendChild(capBtn);
+      selectorContainer.appendChild(capGroup);
+    };
+  </script>
+
+  <!-- 나머지 스크립트와 GPT 연동 섹션은 그대로 유지 -->
+  <script>
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.addEventListener('keydown', function (e) {
+      if (
+        e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'c') ||
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && e.key === 'I')
+      ) {
+        e.preventDefault();
+      }
+    });
+    function autoDownload(imageBlob) {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(imageBlob);
+      const timestamp = new Date().toISOString().replace(/[:.-]/g, '');
+      a.download = `tarozon-capture-${timestamp}.jpg`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+  </script>
   
   <div id="reading-section" style="margin-top: 40px; max-width: 800px; width: 90%; text-align: center;">
     <h2>🔮 GPT 리딩 요청 자동 템플릿</h2>
