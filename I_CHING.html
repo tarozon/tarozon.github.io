@@ -1,3 +1,8 @@
+알겠습니다. 카드 이미지 파일 경로를 `/cards/` 폴더에서 `/iching/` 폴더로 변경하겠습니다.
+
+아래는 `/iching/` 폴더의 카드 사진을 불러오도록 수정된 전체 코드입니다.
+
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -214,7 +219,6 @@
   </div>
   <script>
     const positions = ["현재", "미래"]; 
-    // 주역 카드 목록 (Number, Korean_name, Chinese_Char) - CSV 파일 기반으로 업데이트
     const cardList = [
       ["1", "건위천", "乾爲天"], ["2", "중지곤", "重地坤"], ["3", "수뢰둔", "水雷屯"], ["4", "산수몽", "山水蒙"],
       ["5", "수천수", "水天需"], ["6", "천수송", "天水訟"], ["7", "지수사", "地水師"], ["8", "수지비", "水地比"],
@@ -238,7 +242,7 @@
       const selectorContainer = document.getElementById('selectors');
       const selects = [];
 
-      for (let i = 0; i < 2; i++) { // 루프를 2회만 돌도록 변경
+      for (let i = 0; i < 2; i++) { 
         const group = document.createElement('div');
         group.className = 'selector-group';
 
@@ -247,11 +251,10 @@
         defaultOpt.value = '';
         defaultOpt.text = `${i + 1}. ${positions[i]}`;
         select.appendChild(defaultOpt);
-        // 주역 카드 목록 사용
         cardList.forEach(([number, koreanName, chineseChar]) => {
           const opt = document.createElement('option');
-          opt.value = number; // 이미지 파일 이름은 번호로 사용
-          opt.text = `${number}. ${koreanName} ${chineseChar}`; // 번호, 한글 이름, 한자 표시
+          opt.value = number; 
+          opt.text = `${number}. ${koreanName} ${chineseChar}`; 
           select.appendChild(opt);
         });
 
@@ -263,7 +266,7 @@
         rndBtn.className = 'random-btn';
         rndBtn.addEventListener('click', () => {
           const used = selects.map((s,j)=> j===i?null:s.value).filter(v=>v);
-          const avail = cardList.map(c=>c[0]).filter(c=>!used.includes(c)); // 카드 번호(첫 번째 요소)를 사용
+          const avail = cardList.map(c=>c[0]).filter(c=>!used.includes(c)); 
           if (!avail.length) return;
           const code = avail[Math.floor(Math.random()*avail.length)];
           select.value = code;
@@ -290,7 +293,7 @@
         drawOverlay.querySelector('.draw-button').addEventListener('click', (e) => {
             e.stopPropagation(); 
             const used = selects.map((s,j)=> j===i?null:s.value).filter(v=>v);
-            const avail = cardList.map(c=>c[0]).filter(c=>!used.includes(c)); // 카드 번호(첫 번째 요소)를 사용
+            const avail = cardList.map(c=>c[0]).filter(c=>!used.includes(c)); 
             if (!avail.length) return;
             const code = avail[Math.floor(Math.random()*avail.length)];
             select.value = code;
@@ -304,7 +307,7 @@
 
             if (code) {
                 const rot = Math.random() > 0.5 ? 'rotate(180deg)' : 'rotate(0deg)';
-                img.src = `/cards/${code}.jpg`; // 주역 카드 이미지 파일 경로 (예: /cards/1.jpg)
+                img.src = `/iching/${code}.jpg`; // 이미지 파일 경로를 /iching/ 폴더로 변경
                 img.style.transform = rot; 
                 cardSlot.classList.add('is-flipped'); 
             } else {
@@ -321,10 +324,10 @@
       allBtn.textContent = 'DRAW ALL';
       allBtn.className = 'random-btn';
       allBtn.addEventListener('click', () => {
-        const codes = cardList.map(c=>c[0]); // 카드 번호만 추출
+        const codes = cardList.map(c=>c[0]); 
         const shuffled = codes.sort(()=>Math.random()-0.5);
         selects.forEach((sel,j)=>{ 
-            if (j < 2) { // 2개의 카드만 처리
+            if (j < 2) { 
                 sel.value=shuffled[j]; 
                 sel.dispatchEvent(new Event('change')); 
             }
@@ -389,7 +392,7 @@
       const a = document.createElement("a");
       a.href = URL.createObjectURL(imageBlob);
       const timestamp = new Date().toISOString().replace(/[:.-]/g, '');
-      a.download = `iching-capture-${timestamp}.jpg`; // 파일명 변경
+      a.download = `iching-capture-${timestamp}.jpg`; 
       a.click();
       URL.revokeObjectURL(a.href);
     }
@@ -411,9 +414,8 @@
       const img = document.getElementById(imgId);
       if (!img || !img.src) return "(선택되지 않음)";
       const code = img.src.split("/").pop().replace(".jpg", "");
-      // cardList는 이제 [번호, 한글이름, 한자] 구조이므로, 번호로 찾아서 한글이름과 한자를 반환
       const found = cardList.find(([number, _, __]) => number === code); 
-      return found ? `${found[1]} (${found[2]})` : code; // "한글이름 (한자)" 형식으로 반환
+      return found ? `${found[1]} (${found[2]})` : code; 
     }
 
     function generatePrompt() {
@@ -448,3 +450,4 @@
 
 </body>
 </html>
+```
