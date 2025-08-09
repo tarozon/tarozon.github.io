@@ -1,27 +1,30 @@
-/* 전체 기본 폰트 및 배경 톤 */
+/* 배경과 기본 폰트 톤 변경 */
 body {
   margin: 0;
   padding: 20px;
-  font-family: 'Helvetica Neue', sans-serif;
-  background-color: #fffdf2;
-  color: #333;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #f9f7f3 0%, #e6e2d3 100%);
+  color: #2c2c2c;
 }
 
 /* 제목 스타일 */
 h1, h2 {
   text-align: center;
-  color: #4b3b73;
+  color: #4a3f55;
   margin-top: 20px;
   margin-bottom: 16px;
+  font-weight: 700;
+  font-family: 'Georgia', serif;
 }
 
 /* 메인 서브타이틀 */
 .main-subtitle {
   text-align: center;
   font-size: 16px;
-  color: #666;
+  color: #5a5566;
   margin-top: 8px;
   margin-bottom: 24px;
+  font-style: italic;
 }
 
 /* 전체 레이아웃 중앙 정렬 */
@@ -29,18 +32,26 @@ h1, h2 {
   max-width: 900px;
   margin: 0 auto;
   padding: 20px;
+  background-color: #fffdf7;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
 }
 
-/* 메인 메뉴 버튼 스타일 (index 전용) */
+/* 메인 메뉴 버튼 스타일 */
 .main-menu {
   list-style: none;
   padding: 0;
-  margin: 30px auto;
-  max-width: 500px;
+  margin: 40px auto;
+  max-width: 520px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
 }
 
 .main-menu li {
-  margin-bottom: 14px;
+  flex: 1 1 45%;
+  min-width: 160px;
 }
 
 .main-button {
@@ -48,160 +59,109 @@ h1, h2 {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background-color: #ffd5eb;
-  color: #6e3b4e;
+  background-color: #cfa6d0;
+  color: #3f2a45;
   text-decoration: none;
   padding: 14px 20px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(63, 42, 69, 0.15);
   text-align: center;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  user-select: none;
 }
 
 .main-button .icon {
-  font-size: 18px;
-  color: #ff62a5;
+  font-size: 20px;
+  color: #a66f9b;
 }
 
 .main-button:hover {
-  background-color: #ff91c9;
-  transform: translateY(-2px);
+  background-color: #b17fb7;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(63, 42, 69, 0.25);
 }
 
 /* 안내 섹션 스타일 */
 .main-info {
-  max-width: 500px;  /* 메인 메뉴와 동일 */
-  width: 90%;        /* 반응형 유지 */
+  max-width: 520px;
+  width: 90%;
   margin: 40px auto;
   font-size: 15px;
-  line-height: 1.7;
-  padding: 20px;
-  background-color: #fff7fb;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-
-.main-info h2 {
-  margin-top: 20px;
-  color: #a04370;
-}
-
-.main-info ul {
-  padding-left: 20px;
-  margin-top: 8px;
-}
-
-.main-info li {
-  margin-bottom: 8px;
+  line-height: 1.8;
+  padding: 24px 28px;
+  background-color: #faf7f3;
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+  color: #4a4455;
 }
 
 /* 버튼 스타일 */
 button, .btn {
-  background-color: #f3e1ff;
-  color: #333;
-  padding: 10px 16px;
+  background-color: #d8b4e2;
+  color: #3f2a45;
+  padding: 12px 18px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 15px;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.2s ease;
+  box-shadow: 0 4px 10px rgba(63, 42, 69, 0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  user-select: none;
 }
 
 button:hover, .btn:hover {
-  background-color: #e4d0ff;
-}
-
-/* 셀렉트 박스 */
-select {
-  padding: 8px 12px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  background-color: #bb96cc;
+  transform: translateY(-2px);
 }
 
 /* 홈 버튼: 좌상단 고정 */
 .home-button {
   position: fixed;
-  top: 12px;
-  left: 12px;
+  top: 16px;
+  left: 16px;
   z-index: 999;
-  background-color: #f6e9ff;
-  color: #333;
+  background-color: #f3e6fb;
+  color: #3f2a45;
   text-decoration: none;
-  padding: 8px 12px;
+  padding: 10px 14px;
   font-size: 14px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.2s ease;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(63, 42, 69, 0.12);
+  transition: background-color 0.3s ease;
+  user-select: none;
 }
 
 .home-button:hover {
-  background-color: #e6d6ff;
+  background-color: #e7d4f8;
 }
 
-/* 실물리딩 오른쪽 상단 */
-.reading-button {
+/* 캡처 워터마크용 클래스 */
+.capture-watermark {
   position: fixed;
-  top: 12px;
-  right: 12px;
-  z-index: 999;
-  background-color: #ffc0da;
-  color: #6e3b4e;
-  font-weight: 500;
-  padding: 8px 14px;
-  font-size: 14px;
-  border-radius: 10px;
-  border: 1.5px solid #f9c46b;
-  cursor: pointer;
-  box-shadow: 0 0 6px rgba(255, 179, 218, 0.6), 0 0 4px rgba(249, 196, 107, 0.5);
-  transition: transform 0.2s, box-shadow 0.2s;
+  bottom: 16px;
+  right: 16px;
+  font-size: 12px;
+  color: rgba(63, 42, 69, 0.3);
+  font-weight: 700;
+  user-select: none;
+  pointer-events: none;
+  z-index: 9999;
+  font-family: 'Georgia', serif;
 }
 
-.reading-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 10px rgba(255, 179, 218, 0.8), 0 0 6px rgba(249, 196, 107, 0.7);
-}
-
-/* 카드 이미지에 적용되는 fade-in 효과 */
-.card-slot img {
-  transition: opacity 1.5s ease;
-}
-
-/* 출력 결과용 pre 태그 */
-pre {
-  background-color: #faf5ff;
-  border: 1px solid #e4d4ff;
-  padding: 14px;
-  border-radius: 10px;
-  white-space: pre-wrap;
-  font-family: monospace;
-}
-
-/* 푸터 디자인 */
-footer {
-  margin-top: 40px;
-  text-align: center;
-  font-size: 13px;
-  color: #999;
-}
-
-/* 모바일 반응형 여백 개선 */
+/* 모바일 반응형 */
 @media (max-width: 768px) {
   body {
     padding: 16px;
   }
 
   .home-button {
-    top: 10px;
-    left: 10px;
+    top: 12px;
+    left: 12px;
     font-size: 13px;
-    padding: 6px 10px;
+    padding: 8px 12px;
   }
 
   h1, h2 {
@@ -210,54 +170,10 @@ footer {
 
   button, .btn {
     font-size: 14px;
-    padding: 8px 12px;
+    padding: 10px 14px;
   }
-}
 
-/* 실물리딩요청버튼 반응형 */
-@media (max-width: 768px) {
-  .reading-button {
-    top: 10px;
-    right: 10px;
-    font-size: 13px;
-    padding: 6px 10px;
+  .main-menu li {
+    flex-basis: 100%;
   }
-}
-
-/* 소셜 아이콘 링크 블럭 (가운데 정렬) */
-.social-links {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  margin: 40px 0;
-  flex-wrap: wrap;
-}
-
-/* 각 아이콘 버튼 */
-.social-links a {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background-color: #fff;
-  border: 1px solid #eee;
-  border-radius: 9999px;
-  font-size: 14px;
-  color: #333;
-  text-decoration: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
-}
-
-.social-links a:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* 아이콘 이미지 통일 */
-.social-links img {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
 }
