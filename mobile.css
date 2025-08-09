@@ -1,14 +1,19 @@
+/*
+  mobile.css
+  모바일 기기에서 카드 이미지는 가로 스크롤, 버튼은 자연스럽게 정돈되게 구성
+*/
+
 @media only screen and (max-device-width: 768px) {
 
   body {
-    font-size: 17px;
-    line-height: 1.7;
-    padding: 14px 12px;
-    background: linear-gradient(135deg, #fff7fb 0%, #f9e6f1 100%);
+    font-size: 16px;
+    line-height: 1.6;
+    padding: 10px;
+    background-color: #fffdf2;
+
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    color: #333;
   }
 
   /* 카드 스크롤 영역 */
@@ -18,10 +23,6 @@
     white-space: nowrap;
     -webkit-overflow-scrolling: touch;
     width: 100%;
-    padding-bottom: 12px;
-    border-radius: 12px;
-    background-color: #fff7fb;
-    box-shadow: 0 4px 12px rgba(110, 59, 78, 0.08);
   }
 
   .spread {
@@ -29,26 +30,19 @@
     flex-direction: row;
     justify-content: flex-start;
     width: max-content;
-    gap: 16px;
-    padding: 14px 12px;
+    gap: 12px;
+    padding-bottom: 10px;
   }
 
   .card-slot {
-    width: 150px;
-    height: 264px;
-    border: 1.5px solid #e3c8df;
+    width: 144px;
+    height: 252px;
+    border: 1px solid #ccc;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #fff0f9;
+    background-color: white;
     flex-shrink: 0;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(255, 182, 220, 0.3);
-    transition: box-shadow 0.3s ease;
-  }
-
-  .card-slot:hover {
-    box-shadow: 0 8px 16px rgba(255, 182, 220, 0.5);
   }
 
   .card-slot img {
@@ -57,7 +51,6 @@
     object-fit: cover;
     transition: opacity 2s ease;
     opacity: 0;
-    border-radius: 10px;
   }
 
   .card-slot img.visible {
@@ -65,12 +58,9 @@
   }
 
   h1, h2 {
-    font-size: 22px;
+    font-size: 20px;
     text-align: center;
     white-space: normal;
-    font-family: 'Georgia', serif;
-    color: #4b3b73;
-    margin-bottom: 12px;
   }
 
   /* 버튼 레이아웃: 자연스럽게 감싸기 */
@@ -78,42 +68,33 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 14px;
-    margin-top: 16px;
-    margin-bottom: 24px;
+    gap: 12px;
+    margin-top: 10px;
+    margin-bottom: 20px;
   }
 
   .selector-group {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     max-width: 160px;
     width: 100%;
   }
 
   select, button {
     width: 100%;
-    font-size: 16px;
-    padding: 12px;
-    border-radius: 12px;
+    font-size: 15px;
+    padding: 10px;
+    border-radius: 8px;
     border: none;
-    box-shadow: 0 4px 10px rgba(110, 59, 78, 0.1);
-    background-color: #ffd5eb;
-    color: #6e3b4e;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: #f3e1ff;
     cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    user-select: none;
-  }
-
-  select:focus, button:focus {
-    outline: none;
-    box-shadow: 0 0 8px #ff91c9;
   }
 
   button:hover {
-    background-color: #ff91c9;
-    transform: translateY(-2px);
+    background-color: #e4d0ff;
   }
+
 }
