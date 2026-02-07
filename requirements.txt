@@ -1,0 +1,6 @@
+streamlit
+pillow
+streamlit-image-coordinates
+st-copy-to-clipboard
+supabase
+python-dotenv

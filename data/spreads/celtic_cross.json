@@ -1,0 +1,40 @@
+{
+  "id": "celtic_cross",
+  "name": "켈틱 크로스 (10장)",
+  "slots": [
+    { "key": "slot1", "label": "현재 상황" },
+    { "key": "slot2", "label": "장애 요소", "allowed_angles": [90, 270] },
+    { "key": "slot3", "label": "의식(목표)" },
+    { "key": "slot4", "label": "무의식(뿌리)" },
+    { "key": "slot5", "label": "과거" },
+    { "key": "slot6", "label": "가까운 미래" },
+    { "key": "slot7", "label": "나 자신" },
+    { "key": "slot8", "label": "주변 환경" },
+    { "key": "slot9", "label": "희망/두려움" },
+    { "key": "slot10", "label": "결과" }
+  ],
+  "prompt": {
+    "type": "cards_with_labels",
+    "deck_line_prefix": "사용한 덱은",
+    "cards_intro": "뽑은 카드는 켈틱 크로스 배열이야. 카드별 의미는 아래와 같아:"
+  },
+  "layout": {
+    "type": "absolute",
+    "scale": 1.0,
+    "canvas": { "width": 1200, "height": 1386, "background": "#fffdf2" },
+    "card": { "width": 144, "height": 252 },
+    "slots": [
+      { "key": "slot1", "anchor": "center", "cx": 552, "cy": 524, "z": 1, "allowed_angles": [0, 180] },
+      { "key": "slot2", "anchor": "center", "cx": 552, "cy": 524, "z": 2, "allowed_angles": [90, 270] },
+      { "key": "slot3", "anchor": "center", "cx": 552, "cy": 209, "z": 1, "allowed_angles": [0, 180] },
+      { "key": "slot4", "anchor": "center", "cx": 552, "cy": 839, "z": 1, "allowed_angles": [0, 180] },
+      { "key": "slot5", "anchor": "center", "cx": 768, "cy": 524, "z": 1, "allowed_angles": [0, 180] },
+      { "key": "slot6", "anchor": "center", "cx": 336, "cy": 524, "z": 1, "allowed_angles": [0, 180] },
+      { "key": "slot7", "anchor": "center", "cx": 1008, "cy": 985, "z": 1, "allowed_angles": [0, 180] },
+      { "key": "slot8", "anchor": "center", "cx": 1008, "cy": 713, "z": 1, "allowed_angles": [0, 180] },
+      { "key": "slot9", "anchor": "center", "cx": 1008, "cy": 441, "z": 1, "allowed_angles": [0, 180] },
+      { "key": "slot10", "anchor": "center", "cx": 1008, "cy": 169, "z": 1, "allowed_angles": [0, 180] }
+    ]
+  }
+}
+

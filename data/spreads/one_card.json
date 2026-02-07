@@ -1,0 +1,22 @@
+{
+  "id": "one_card",
+  "name": "1카드",
+  "slots": [
+    { "key": "card1", "label": "1카드 메시지" }
+  ],
+  "prompt": {
+    "type": "cards_with_labels",
+    "deck_line_prefix": "사용한 덱은",
+    "cards_intro": "뽑은 카드는 아래와 같아."
+  },
+  "layout": {
+    "type": "absolute",
+    "scale": 2.2,
+    "canvas": { "width": 600, "height": 450, "background": "#fffdf2" },
+    "card": { "width": 144, "height": 252 },
+    "slots": [
+      { "key": "card1", "anchor": "center", "cx": 300, "cy": 225, "z": 1, "allowed_angles": [0, 180] }
+    ]
+  }
+}
+

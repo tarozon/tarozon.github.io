@@ -1,0 +1,3 @@
+streamlit
+pillow
+streamlit-image-coordinates

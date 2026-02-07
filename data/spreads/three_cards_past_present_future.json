@@ -1,0 +1,26 @@
+{
+  "id": "three_cards_past_present_future",
+  "name": "3카드",
+  "slots": [
+    { "key": "past", "label": "과거" },
+    { "key": "present", "label": "현재" },
+    { "key": "future", "label": "미래" }
+  ],
+  "prompt": {
+    "type": "cards_with_labels",
+    "deck_line_prefix": "사용한 덱은",
+    "cards_intro": "뽑은 카드는 아래와 같아."
+  },
+  "layout": {
+    "type": "absolute",
+    "scale": 2.0,
+    "canvas": { "width": 900, "height": 420, "background": "#fffdf2" },
+    "card": { "width": 144, "height": 252 },
+    "slots": [
+      { "key": "past", "anchor": "center", "cx": 210, "cy": 210, "z": 1, "allowed_angles": [0, 180] },
+      { "key": "present", "anchor": "center", "cx": 450, "cy": 210, "z": 1, "allowed_angles": [0, 180] },
+      { "key": "future", "anchor": "center", "cx": 690, "cy": 210, "z": 1, "allowed_angles": [0, 180] }
+    ]
+  }
+}
+
