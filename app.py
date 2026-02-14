@@ -235,7 +235,11 @@ def _download_png_bytes(png_bytes: bytes, spread_id: str, deck_id: str) -> tuple
     return out_bytes, meta
 
 
-st.set_page_config(page_title="TAROZON", page_icon="🔮", layout="centered")
+st.set_page_config(
+    page_title="TAROZON",
+    page_icon=str(REPO_ROOT / "legacy" / "favicon.ico"),
+    layout="centered",
+)
 
 decks = load_decks(REPO_ROOT)
 spreads = load_spreads(REPO_ROOT)
@@ -349,7 +353,7 @@ def _sync_host_room_if_any() -> None:
             ).start()
 
 
-_CHAT_MESSAGE_CONTAINER_HEIGHT = 400
+_CHAT_MESSAGE_CONTAINER_HEIGHT = 300
 
 
 def _render_chat_expander(room_code: str, key_prefix: str = "chat", fragment_scope: bool = False) -> None:
@@ -383,11 +387,36 @@ def _render_chat_expander(room_code: str, key_prefix: str = "chat", fragment_sco
                   background-color: rgba(33, 150, 243, 0.12); border: 1px solid rgba(33, 150, 243, 0.3); border-radius: 0.5rem;
                 }
                 </style>
-                <script>
-                (function(){function scrollToBottom(){var root=document.querySelector('.st-key-tarozon_chat_messages');if(!root)return;var el=root;while(el){if(el.scrollHeight>el.clientHeight){el.scrollTop=el.scrollHeight;return;}el=el.parentElement;}}setTimeout(scrollToBottom,150);})();
-                """
-                + "</scr" + "ipt>",
+                """,
                 unsafe_allow_html=True,
+            )
+            st.html(
+                """
+                <script>
+                (function() {
+                    const targetNode = document.querySelector('.st-key-tarozon_chat_messages');
+                    if (!targetNode) return;
+
+                    const scrollFull = () => {
+                        const scrollable = [targetNode, ...targetNode.querySelectorAll('*')]
+                            .filter(el => el.scrollHeight > el.clientHeight);
+                        scrollable.forEach(el => {
+                            el.scrollTo({ top: el.scrollHeight, behavior: 'auto' });
+                        });
+                    };
+
+                    scrollFull();
+
+                    const observer = new MutationObserver(() => {
+                        scrollFull();
+                        setTimeout(scrollFull, 50);
+                    });
+
+                    observer.observe(targetNode, { childList: true, subtree: true });
+                })();
+                </script>
+                """,
+                unsafe_allow_javascript=True,
             )
             current_nick = (st.session_state.chat_nickname or "").strip()
             for i, msg in enumerate(messages):
@@ -453,10 +482,29 @@ def _fragment_host_chat(room_code: str) -> None:
     _render_chat_expander(room_code, "chat_main", fragment_scope=True)
 
 
-st.title("🔮 TAROZON")
-st.caption("모든 카드 선택/표시는 ‘스프레드 보드’에서만 진행됩니다. (빈 곳 클릭=뽑기, 이미 뽑힌 카드 클릭=FLIP)")
-
 with st.sidebar:
+    st.markdown(
+        """
+        <style>
+        [data-testid="stSidebar"] [data-testid="stVerticalBlock"] { padding-top: 0.35rem; margin-top: 0; margin-bottom: 0.2rem; }
+        [data-testid="stSidebar"] > div:first-child { padding-top: 0.25rem; }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    _favicon_path = REPO_ROOT / "legacy" / "favicon.ico"
+    if _favicon_path.exists():
+        _favicon_b64 = base64.b64encode(_favicon_path.read_bytes()).decode()
+        _favicon_data = f"data:image/x-icon;base64,{_favicon_b64}"
+        st.markdown(
+            f'<div style="display:flex; align-items:center; gap:0.35rem;">'
+            f'<img src="{_favicon_data}" width="28" height="28" style="flex-shrink:0;" />'
+            f'<span style="font-size:1.25rem; font-weight:700;">TAROZON</span></div>',
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown("### TAROZON")
+    st.markdown("---")
     if not st.session_state.get("viewer_mode"):
         st.header("설정")
     deck_options = {d.name: d.id for d in decks.values()}
