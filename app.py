@@ -7,6 +7,7 @@ load_dotenv()
 import base64
 import io
 import json
+import os
 import threading
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -156,6 +157,15 @@ def _get_query_state() -> str | None:
     return v[0] if v else None
 
 
+def _get_admin_param() -> str | None:
+    if hasattr(st, "query_params"):
+        v = st.query_params.get("admin")
+        return v[0] if isinstance(v, list) and v else (str(v) if v else None)
+    qp = st.experimental_get_query_params()
+    v = qp.get("admin")
+    return v[0] if v else None
+
+
 def _set_query_state(encoded: str) -> None:
     if hasattr(st, "query_params"):
         cur = _get_query_state()
@@ -248,6 +258,7 @@ if not decks or not spreads:
     st.stop()
 
 DECK_DISPLAY_ORDER = ("rws", "iching", "thoth", "holitzka")
+MASTER_ONLY_DECK_IDS = ("holitzka", "thoth")
 default_deck_id = "rws" if "rws" in decks else sorted(decks.keys())[0]
 default_spread_id = "one_card" if "one_card" in spreads else sorted(spreads.keys())[0]
 
@@ -310,6 +321,21 @@ if "chat_nickname" not in st.session_state:
     import random
     st.session_state.chat_nickname = "손님" + str(random.randint(1000, 9999))
 
+# room 쿼리 파라미터로 자동 입장
+room_param = None
+if hasattr(st, "query_params"):
+    v = st.query_params.get("room")
+    room_param = v[0] if isinstance(v, list) and v else (str(v) if v else None)
+else:
+    qp = st.experimental_get_query_params()
+    v = qp.get("room")
+    room_param = v[0] if v else None
+
+if room_param and (rp := room_param.strip().upper()):
+    st.session_state.viewer_mode = True
+    st.session_state.viewer_room_code = rp
+    st.session_state.host_room_code = None
+
 # Viewer: fetch room and restore draw_state (방 있을 때만 get_room_manager 호출 → 솔로 모드에서는 미호출)
 if st.session_state.get("viewer_mode") and st.session_state.get("viewer_room_code"):
     rm = get_room_manager()
@@ -353,7 +379,7 @@ def _sync_host_room_if_any() -> None:
             ).start()
 
 
-_CHAT_MESSAGE_CONTAINER_HEIGHT = 300
+_CHAT_MESSAGE_CONTAINER_HEIGHT = 250
 
 
 def _render_chat_expander(room_code: str, key_prefix: str = "chat", fragment_scope: bool = False) -> None:
@@ -424,8 +450,9 @@ def _render_chat_expander(room_code: str, key_prefix: str = "chat", fragment_sco
                 is_mine = msg_user == current_nick
                 wrapper_key = f"chat_msg_{i}_mine" if is_mine else f"chat_msg_{i}_other"
                 with st.container(key=wrapper_key):
-                    with st.chat_message(name=msg["user_name"]):
-                        st.write(msg["content"])
+                    display_name = (msg.get("user_name") or "").strip()[:5] or "?"
+                    with st.chat_message(name=display_name[:1]):
+                        st.markdown(f"**{display_name}**: {msg['content']}")
         prompt = st.chat_input("메시지 입력...", key=f"{key_prefix}_input")
         if prompt and (prompt := str(prompt).strip()):
             display_name = st.session_state.get(nick_key, st.session_state.chat_nickname) or st.session_state.chat_nickname
@@ -470,7 +497,10 @@ def _fragment_viewer_live(room_code: str) -> None:
         codes=tuple(ds.codes),
         angles=tuple(int(a) for a in ds.angles),
     )
-    st.subheader(f"Viewer 모드 — {spread.name} 보드")
+    st.markdown(
+        "<div style='font-size: 0.7rem; color: gray; text-align: right;'>Viewer Mode</div>",
+        unsafe_allow_html=True,
+    )
     st.image(png_bytes, use_container_width=True)
     st.caption("3초마다 자동 새로고침")
     _render_chat_expander(room_code, "chat_viewer", fragment_scope=True)
@@ -508,11 +538,33 @@ with st.sidebar:
     if not st.session_state.get("viewer_mode"):
         st.header("설정")
     deck_options = {d.name: d.id for d in decks.values()}
-    ordered_deck_names = [decks[did].name for did in DECK_DISPLAY_ORDER if did in decks]
+    is_admin = _get_admin_param() == "tarozon1"
+    available_deck_ids = [did for did in DECK_DISPLAY_ORDER if did in decks]
+    if not is_admin:
+        available_deck_ids = [did for did in available_deck_ids if did not in MASTER_ONLY_DECK_IDS]
+    ordered_deck_names = [decks[did].name for did in available_deck_ids]
     for did, d in decks.items():
         if d.name not in ordered_deck_names:
-            ordered_deck_names.append(d.name)
+            if is_admin or did not in MASTER_ONLY_DECK_IDS:
+                ordered_deck_names.append(d.name)
     spread_options = {s.name: s.id for s in spreads.values()}
+
+    if deck.name not in ordered_deck_names:
+        fallback_id = (
+            "rws"
+            if "rws" in decks and "rws" not in MASTER_ONLY_DECK_IDS
+            else available_deck_ids[0]
+        )
+        fallback_deck = decks[fallback_id]
+        st.session_state.draw_state = DrawState(
+            deck_id=fallback_id,
+            spread_id=st.session_state.draw_state.spread_id,
+            codes=[None for _ in range(spread.n_cards)],
+            angles=[_default_angle_for_slot(spread, i, fallback_deck) for i in range(spread.n_cards)],
+        )
+        _set_query_state(_encode_state(st.session_state.draw_state))
+        _sync_host_room_if_any()
+        st.rerun()
 
     sel_deck_name = st.selectbox(
         "덱",
@@ -583,28 +635,35 @@ with st.sidebar:
     st.markdown("---")
     st.subheader("실시간 리딩 교환")
     if st.session_state.get("viewer_mode"):
-        st.info("Viewer 모드 — 3초마다 자동 새로고침")
         if st.button("Viewer 나가기", use_container_width=True):
             st.session_state.viewer_mode = False
             st.session_state.viewer_room_code = None
             st.session_state.last_viewer_state_json = None
             st.rerun()
     else:
+        is_admin = _get_admin_param() == "tarozon1"
         if st.session_state.get("host_room_code"):
-            st.success(f"방 코드: **{st.session_state.host_room_code}**")
-            st.code(st.session_state.host_room_code, language=None)
-        if st.button("방 생성", use_container_width=True):
-            rm = get_room_manager()
-            if not rm.is_available:
-                st.error("Supabase 설정 필요 (SUPABASE_URL, SUPABASE_SERVICE_KEY)")
-            else:
-                state_dict = _draw_state_to_dict(st.session_state.draw_state)
-                code = rm.create_room(state_dict)
-                if code:
-                    st.session_state.host_room_code = code
-                    st.rerun()
+            room_code = st.session_state.host_room_code
+            base_url = os.environ.get("TAROZON_BASE_URL", "https://tarozon.com").rstrip("/")
+            invite_url = f"{base_url}/?room={room_code}"
+            st.success(f"방 코드: **{room_code}**")
+            st.caption("초대 링크 (클릭하여 복사)")
+            st.code(invite_url, language=None)
+        if is_admin:
+            if st.button("방 생성", use_container_width=True):
+                rm = get_room_manager()
+                if not rm.is_available:
+                    st.error("Supabase 설정 필요 (SUPABASE_URL, SUPABASE_SERVICE_KEY)")
                 else:
-                    st.error("방 생성에 실패했어요.")
+                    state_dict = _draw_state_to_dict(st.session_state.draw_state)
+                    code = rm.create_room(state_dict)
+                    if code:
+                        st.session_state.host_room_code = code
+                        st.rerun()
+                    else:
+                        st.error("방 생성에 실패했어요.")
+        else:
+            st.caption("입장 코드를 입력하세요")
         join_code_raw = st.text_input("6자리 코드", key="room_code_input", placeholder="ABC123")
         join_code = (join_code_raw.strip().upper() if join_code_raw else "") or None
         if st.button("방 입장", use_container_width=True) and join_code:
