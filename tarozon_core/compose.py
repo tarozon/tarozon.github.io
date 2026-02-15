@@ -175,20 +175,46 @@ def compose_spread_image(
     return RenderResult(png_bytes=out.getvalue(), width=canvas_w, height=canvas_h)
 
 
+def _find_serif_font(font_size: int) -> ImageFont.FreeTypeFont:
+    """DejaVu Serif 우선, 없으면 시스템 serif/sans 순차 시도. Linux/Windows/macOS 대응."""
+    candidates = [
+        # Linux (Debian/Ubuntu, AWS 등)
+        "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf",
+        "/usr/share/fonts/TTF/DejaVuSerif.ttf",
+        # Linux sans fallback
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        # Windows
+        "C:/Windows/Fonts/times.ttf",
+        "C:/Windows/Fonts/georgia.ttf",
+        "C:/Windows/Fonts/DejaVuSerif.ttf",
+        # macOS
+        "/System/Library/Fonts/Supplemental/Times.ttc",
+    ]
+    for path in candidates:
+        try:
+            return ImageFont.truetype(path, font_size)
+        except (OSError, IOError):
+            continue
+    return ImageFont.load_default()
+
+
 def prepare_download_png(
     *,
     png_bytes: bytes,
     watermark_text: str = "Tarozon.com",
     max_side: int = 1080,
-    opacity: int = 72,  # 0-255
+    opacity: int = 255,
     padding: int = 18,
     compress_level: int = 9,
+    frame_padding: int = 24,
+    border_width: int = 6,
 ) -> tuple[bytes, int, int]:
     """
-    Prepare PNG for sharing:
+    Prepare PNG for sharing (Grand Budapest theme):
     - Downscale to max_side on the longest edge (mobile-friendly)
-    - Add semi-transparent watermark (bottom-right)
-    - Save PNG with strong compression
+    - Add frame (ivory background, gold double border)
+    - Add watermark (Hotel Gold, bottom-right)
     Returns: (png_bytes, width, height)
     """
     img = Image.open(io.BytesIO(png_bytes)).convert("RGBA")
@@ -199,41 +225,50 @@ def prepare_download_png(
         nh = max(1, int(round(h * scale)))
         img = img.resize((nw, nh), Image.Resampling.LANCZOS)
 
+    # Frame: ivory background, gold double border
+    bg_color = (255, 254, 248, 255)  # #FFFEF8
+    gold = (212, 175, 55, 255)  # #D4AF37
+    new_w = img.width + 2 * frame_padding
+    new_h = img.height + 2 * frame_padding
+    canvas = Image.new("RGBA", (new_w, new_h), bg_color)
+    canvas.paste(img, (frame_padding, frame_padding))
+
+    draw = ImageDraw.Draw(canvas)
+    # Outer border
+    draw.rectangle(
+        [(0, 0), (new_w - 1, new_h - 1)],
+        outline=gold,
+        width=border_width,
+    )
+    # Inner border (double effect)
+    gap = border_width
+    draw.rectangle(
+        [(gap, gap), (new_w - 1 - gap, new_h - 1 - gap)],
+        outline=gold,
+        width=border_width,
+    )
+
     # Watermark overlay
     if watermark_text.strip():
-        overlay = Image.new("RGBA", img.size, (0, 0, 0, 0))
-        draw = ImageDraw.Draw(overlay)
+        font_size = max(14, int(round(min(canvas.size) * 0.04)))
+        font = _find_serif_font(font_size)
 
-        # Font: try DejaVuSans, fallback to default bitmap font
-        font_size = max(14, int(round(min(img.size) * 0.035)))
-        font = None
-        try:
-            font = ImageFont.truetype("DejaVuSans.ttf", font_size)
-        except Exception:
-            try:
-                font = ImageFont.truetype("arial.ttf", font_size)
-            except Exception:
-                font = ImageFont.load_default()
-
-        # Measure text
         bbox = draw.textbbox((0, 0), watermark_text, font=font, stroke_width=2)
         tw = bbox[2] - bbox[0]
         th = bbox[3] - bbox[1]
 
-        x = img.size[0] - padding - tw
-        y = img.size[1] - padding - th
-        x = max(padding, x)
-        y = max(padding, y)
+        wm_pad = padding + frame_padding
+        x = canvas.size[0] - wm_pad - tw
+        y = canvas.size[1] - wm_pad - th
+        x = max(wm_pad, x)
+        y = max(wm_pad, y)
 
-        # Subtle shadow/outline for readability
-        fill = (255, 255, 255, int(opacity))
-        stroke = (0, 0, 0, int(min(255, opacity + 60)))
+        fill = (212, 175, 55, int(opacity))  # Hotel Gold
+        stroke = (60, 50, 30, 255)  # Dark brown
         draw.text((x, y), watermark_text, font=font, fill=fill, stroke_width=2, stroke_fill=stroke)
 
-        img = Image.alpha_composite(img, overlay)
-
     out = io.BytesIO()
-    img.save(out, format="PNG", optimize=True, compress_level=compress_level)
+    canvas.save(out, format="PNG", optimize=True, compress_level=compress_level)
     out_bytes = out.getvalue()
     fw, fh = Image.open(io.BytesIO(out_bytes)).size
     return out_bytes, fw, fh

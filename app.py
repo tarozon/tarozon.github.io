@@ -236,7 +236,6 @@ def _download_png_bytes(png_bytes: bytes, spread_id: str, deck_id: str) -> tuple
         png_bytes=png_bytes,
         watermark_text="Tarozon.com",
         max_side=1080,
-        opacity=72,
         padding=18,
         compress_level=9,
     )
@@ -251,10 +250,87 @@ st.set_page_config(
     layout="centered",
 )
 
+# Grand Budapest Hotel theme - global CSS
+st.markdown(
+    """
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond&family=Playfair+Display&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+    /* Main background - Mendl's Pink */
+    .stApp { background-color: #F4C2C2 !important; }
+    /* Wes Anderson symmetry - center align, equal margins */
+    .main .block-container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+    /* Typography: Cormorant Garamond (body), Playfair Display (headings) - 텍스트 요소만 (아이콘 제외) */
+    .main .stMarkdown,
+    .main .stMarkdown *,
+    .main label,
+    .main p,
+    .main [data-testid="stMarkdown"] {
+      font-family: 'Cormorant Garamond', Georgia, serif !important;
+    }
+    h1, h2, h3, .stSubheader, [data-testid="stMarkdown"] h1, [data-testid="stMarkdown"] h2, [data-testid="stMarkdown"] h3 { font-family: 'Playfair Display', Georgia, serif !important; }
+    /* Buttons: rectangular, gold border */
+    button, .stButton button, [data-testid="stButton"] button,
+    a[data-testid="stLinkButton"] {
+        border-radius: 0 !important;
+        border: 2px solid #D4AF37 !important;
+        background-color: #A2231D !important;
+        color: white !important;
+    }
+    /* Sidebar: Vintage Plum + Muted Ivory - 텍스트 요소만 폰트 적용 (.stMarkdown * 제외로 아이콘 보호) */
+    [data-testid="stSidebar"] { background-color: #7C5C85 !important; }
+    [data-testid="stSidebar"] .stMarkdown,
+    [data-testid="stSidebar"] label,
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] .stSelectbox label,
+    [data-testid="stSidebar"] .stTextInput label {
+      font-family: 'Cormorant Garamond', Georgia, serif !important;
+      color: #FDF5E6 !important;
+    }
+    /* Sidebar collapse/expand 아이콘 - Material Icons 복구 (범위 확대) */
+    [data-testid="stSidebar"] > div:first-child > button,
+    [data-testid="stSidebar"] button[aria-label*="collapse"],
+    [data-testid="stSidebar"] button[aria-label*="expand"],
+    [data-testid="stSidebar"] button[aria-label*="arrow"],
+    [aria-label*="collapse"],
+    [aria-label*="expand"],
+    [data-testid="stSidebar"] [class*="collapse"] {
+      font-family: 'Material Icons', 'Material Symbols Outlined', 'Material Icons Outlined', sans-serif !important;
+    }
+    [data-testid="stSidebar"] > div:first-child > button *,
+    [data-testid="stSidebar"] button[aria-label*="collapse"] *,
+    [data-testid="stSidebar"] button[aria-label*="expand"] * {
+      font-family: inherit !important;
+    }
+    /* Dividers: Hotel Gold */
+    hr { border-color: #D4AF37 !important; }
+    /* Card board frame - Grand Budapest hotel style */
+    .st-key-board_frame,
+    .st-key-board_frame_viewer {
+      border: 6px double #D4AF37 !important;
+      padding: 1.5rem !important;
+      background-color: #FFFEF8 !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+      border-radius: 0 !important;
+    }
+    /* Viewer frame - position relative for potential overlays */
+    .st-key-board_frame_viewer {
+      position: relative !important;
+    }
+    /* 전체화면 버튼 항상 표시 (호버 없이) */
+    .st-key-board_frame_viewer button[title="View fullscreen"] {
+      opacity: 1 !important;
+      transform: scale(1) !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 decks = load_decks(REPO_ROOT)
 spreads = load_spreads(REPO_ROOT)
 if not decks or not spreads:
-    st.error("덱/스프레드 데이터를 찾지 못했어요. `data/decks`, `data/spreads` 확인이 필요합니다.")
+    st.error("Deck/spread data not found. Please check `data/decks` and `data/spreads`.")
     st.stop()
 
 DECK_DISPLAY_ORDER = ("rws", "iching", "thoth", "holitzka")
@@ -319,7 +395,7 @@ if "last_viewer_state_json" not in st.session_state:
     st.session_state.last_viewer_state_json = None
 if "chat_nickname" not in st.session_state:
     import random
-    st.session_state.chat_nickname = "손님" + str(random.randint(1000, 9999))
+    st.session_state.chat_nickname = "Guest" + str(random.randint(1, 99)).zfill(2)
 
 # room 쿼리 파라미터로 자동 입장
 room_param = None
@@ -389,8 +465,8 @@ def _render_chat_expander(room_code: str, key_prefix: str = "chat", fragment_sco
     nick_key = f"{key_prefix}_nickname"
     if nick_key in st.session_state and st.session_state[nick_key]:
         st.session_state.chat_nickname = str(st.session_state[nick_key]).strip() or st.session_state.chat_nickname
-    with st.expander("💬 실시간 채팅", expanded=True):
-        st.text_input("닉네임", value=st.session_state.chat_nickname, key=nick_key)
+    with st.expander("Concierge Messages", expanded=True):
+        st.text_input("Guest Name", value=st.session_state.chat_nickname, key=nick_key)
         messages = get_chat_manager().get_messages(room_code, limit=20)
         try:
             chat_container = st.container(height=_CHAT_MESSAGE_CONTAINER_HEIGHT, key="tarozon_chat_messages")
@@ -401,16 +477,21 @@ def _render_chat_expander(room_code: str, key_prefix: str = "chat", fragment_sco
                 """
                 <style>
                 /* 1) 여백 축소 - 채팅 메시지 버블 (조밀) */
-                .st-key-tarozon_chat_messages [data-testid="stChatMessage"] { padding: 0.2rem 0.4rem; margin: 0.12rem 0; }
-                .st-key-tarozon_chat_messages .stChatMessage { padding: 0.2rem 0.4rem; margin: 0.12rem 0; }
+                .st-key-tarozon_chat_messages [data-testid="stChatMessage"],
+                .st-key-tarozon_chat_messages .stChatMessage {
+                  padding: 0.2rem 0.4rem; margin: 0.12rem 0;
+                  background-color: white !important;
+                  border-left: 4px solid #D4AF37 !important;
+                  border-radius: 0;
+                }
                 /* 2) 내 메시지 오른쪽 정렬 (wrapper) */
                 .st-key-tarozon_chat_messages [class*="chat_msg_"][class*="_mine"] { margin-left: auto; width: fit-content; max-width: 85%; }
-                /* 3) 내 메시지 배경/테두리 */
-                .st-key-tarozon_chat_messages [class*="chat_msg_"][class*="_mine"] [data-testid="stChatMessage"] {
-                  background-color: rgba(33, 150, 243, 0.12); border: 1px solid rgba(33, 150, 243, 0.3); border-radius: 0.5rem;
-                }
+                /* 3) 내 메시지 - Hotel Gold accent */
+                .st-key-tarozon_chat_messages [class*="chat_msg_"][class*="_mine"] [data-testid="stChatMessage"],
                 .st-key-tarozon_chat_messages [class*="chat_msg_"][class*="_mine"] .stChatMessage {
-                  background-color: rgba(33, 150, 243, 0.12); border: 1px solid rgba(33, 150, 243, 0.3); border-radius: 0.5rem;
+                  background-color: #fff9e6 !important;
+                  border-left: 4px solid #D4AF37 !important;
+                  border-radius: 0;
                 }
                 </style>
                 """,
@@ -450,10 +531,10 @@ def _render_chat_expander(room_code: str, key_prefix: str = "chat", fragment_sco
                 is_mine = msg_user == current_nick
                 wrapper_key = f"chat_msg_{i}_mine" if is_mine else f"chat_msg_{i}_other"
                 with st.container(key=wrapper_key):
-                    display_name = (msg.get("user_name") or "").strip()[:5] or "?"
+                    display_name = (msg.get("user_name") or "").strip()[:7] or "?"
                     with st.chat_message(name=display_name[:1]):
                         st.markdown(f"**{display_name}**: {msg['content']}")
-        prompt = st.chat_input("메시지 입력...", key=f"{key_prefix}_input")
+        prompt = st.chat_input("Compose your message...", key=f"{key_prefix}_input")
         if prompt and (prompt := str(prompt).strip()):
             display_name = st.session_state.get(nick_key, st.session_state.chat_nickname) or st.session_state.chat_nickname
             if get_chat_manager().send_message(room_code, display_name, prompt):
@@ -462,7 +543,7 @@ def _render_chat_expander(room_code: str, key_prefix: str = "chat", fragment_sco
                 else:
                     st.rerun()
             else:
-                st.error("메시지 전송에 실패했어요.")
+                st.error("Failed to send message.")
 
 
 @st.fragment(run_every=timedelta(seconds=3))
@@ -475,7 +556,7 @@ def _fragment_viewer_live(room_code: str) -> None:
         return
     room = rm.get_room(room_code)
     if room is None:
-        st.error("방을 찾을 수 없어요.")
+        st.error("Room not found.")
         return
     obj = room.get("state_json")
     if not isinstance(obj, dict):
@@ -497,12 +578,8 @@ def _fragment_viewer_live(room_code: str) -> None:
         codes=tuple(ds.codes),
         angles=tuple(int(a) for a in ds.angles),
     )
-    st.markdown(
-        "<div style='font-size: 0.7rem; color: gray; text-align: right;'>Viewer Mode</div>",
-        unsafe_allow_html=True,
-    )
-    st.image(png_bytes, use_container_width=True)
-    st.caption("3초마다 자동 새로고침")
+    with st.container(key="board_frame_viewer"):
+        st.image(png_bytes, use_container_width=True)
     _render_chat_expander(room_code, "chat_viewer", fragment_scope=True)
 
 
@@ -529,14 +606,14 @@ with st.sidebar:
         st.markdown(
             f'<div style="display:flex; align-items:center; gap:0.35rem;">'
             f'<img src="{_favicon_data}" width="28" height="28" style="flex-shrink:0;" />'
-            f'<span style="font-size:1.25rem; font-weight:700;">TAROZON</span></div>',
+            f'<span style="font-size:1.25rem; font-weight:700; color:#FDF5E6;">TAROZON</span></div>',
             unsafe_allow_html=True,
         )
     else:
         st.markdown("### TAROZON")
     st.markdown("---")
     if not st.session_state.get("viewer_mode"):
-        st.header("설정")
+        st.header("Settings")
     deck_options = {d.name: d.id for d in decks.values()}
     is_admin = _get_admin_param() == "tarozon1"
     available_deck_ids = [did for did in DECK_DISPLAY_ORDER if did in decks]
@@ -567,17 +644,17 @@ with st.sidebar:
         st.rerun()
 
     sel_deck_name = st.selectbox(
-        "덱",
+        "The Library of Decks",
         options=ordered_deck_names,
         index=ordered_deck_names.index(deck.name),
     )
     sel_spread_name = st.selectbox(
-        "스프레드",
+        "Arrangement",
         options=sorted(spread_options.keys()),
         index=sorted(spread_options.keys()).index(next(n for n, sid in spread_options.items() if sid == spread.id)),
     )
 
-    if st.button("🧹 셔플", use_container_width=True):
+    if st.button("Shuffle the Cards", use_container_width=True):
         new_spread = spreads[spread_options[sel_spread_name]]
         new_deck = decks[deck_options[sel_deck_name]]
         st.session_state.draw_state = DrawState(
@@ -590,52 +667,52 @@ with st.sidebar:
         _sync_host_room_if_any()
         st.rerun()
 
-        if st.button("🎴 DRAW ALL(남은 슬롯)", use_container_width=True, type="primary"):
-            target_spread = spreads[spread_options[sel_spread_name]]
-            draw_deck = decks[deck_options[sel_deck_name]]
-            if st.session_state.draw_state.spread_id != target_spread.id or st.session_state.draw_state.deck_id != deck_options[sel_deck_name]:
-                st.session_state.draw_state = DrawState(
-                    deck_id=deck_options[sel_deck_name],
-                    spread_id=target_spread.id,
-                    codes=[None for _ in range(target_spread.n_cards)],
-                    angles=[_default_angle_for_slot(target_spread, i, draw_deck) for i in range(target_spread.n_cards)],
-                )
-
-            deck = decks[st.session_state.draw_state.deck_id]
-            spread = spreads[st.session_state.draw_state.spread_id]
-
-            existing = [c for c in st.session_state.draw_state.codes if c]
-            need = sum(1 for c in st.session_state.draw_state.codes if c is None)
-            new_codes = draw_many(deck, need, exclude_codes=existing) if need else []
-            it = iter(new_codes)
-            for i in range(spread.n_cards):
-                if st.session_state.draw_state.codes[i] is None:
-                    st.session_state.draw_state.codes[i] = next(it)
-                    st.session_state.draw_state.angles[i] = _random_angle_for_slot(spread, i, deck)
-            _set_query_state(_encode_state(st.session_state.draw_state))
-            _sync_host_room_if_any()
-            st.rerun()
-
-        # Apply deck/spread selection immediately (no extra UI blocks)
-        new_deck_id = deck_options[sel_deck_name]
-        new_spread_id = spread_options[sel_spread_name]
-        if new_deck_id != deck.id or new_spread_id != spread.id:
-            ns = spreads[new_spread_id]
-            new_deck = decks[new_deck_id]
+    if st.button("Unveil All Slots", use_container_width=True, type="primary"):
+        target_spread = spreads[spread_options[sel_spread_name]]
+        draw_deck = decks[deck_options[sel_deck_name]]
+        if st.session_state.draw_state.spread_id != target_spread.id or st.session_state.draw_state.deck_id != deck_options[sel_deck_name]:
             st.session_state.draw_state = DrawState(
-                deck_id=new_deck_id,
-                spread_id=new_spread_id,
-                codes=[None for _ in range(ns.n_cards)],
-                angles=[_default_angle_for_slot(ns, i, new_deck) for i in range(ns.n_cards)],
+                deck_id=deck_options[sel_deck_name],
+                spread_id=target_spread.id,
+                codes=[None for _ in range(target_spread.n_cards)],
+                angles=[_default_angle_for_slot(target_spread, i, draw_deck) for i in range(target_spread.n_cards)],
             )
-            _set_query_state(_encode_state(st.session_state.draw_state))
-            _sync_host_room_if_any()
-            st.rerun()
+
+        deck = decks[st.session_state.draw_state.deck_id]
+        spread = spreads[st.session_state.draw_state.spread_id]
+
+        existing = [c for c in st.session_state.draw_state.codes if c]
+        need = sum(1 for c in st.session_state.draw_state.codes if c is None)
+        new_codes = draw_many(deck, need, exclude_codes=existing) if need else []
+        it = iter(new_codes)
+        for i in range(spread.n_cards):
+            if st.session_state.draw_state.codes[i] is None:
+                st.session_state.draw_state.codes[i] = next(it)
+                st.session_state.draw_state.angles[i] = _random_angle_for_slot(spread, i, deck)
+        _set_query_state(_encode_state(st.session_state.draw_state))
+        _sync_host_room_if_any()
+        st.rerun()
+
+    # Apply deck/spread selection immediately (no extra UI blocks)
+    new_deck_id = deck_options[sel_deck_name]
+    new_spread_id = spread_options[sel_spread_name]
+    if new_deck_id != deck.id or new_spread_id != spread.id:
+        ns = spreads[new_spread_id]
+        new_deck = decks[new_deck_id]
+        st.session_state.draw_state = DrawState(
+            deck_id=new_deck_id,
+            spread_id=new_spread_id,
+            codes=[None for _ in range(ns.n_cards)],
+            angles=[_default_angle_for_slot(ns, i, new_deck) for i in range(ns.n_cards)],
+        )
+        _set_query_state(_encode_state(st.session_state.draw_state))
+        _sync_host_room_if_any()
+        st.rerun()
 
     st.markdown("---")
-    st.subheader("실시간 리딩 교환")
+    st.subheader("Live Reading Exchange")
     if st.session_state.get("viewer_mode"):
-        if st.button("Viewer 나가기", use_container_width=True):
+        if st.button("Check-out", use_container_width=True):
             st.session_state.viewer_mode = False
             st.session_state.viewer_room_code = None
             st.session_state.last_viewer_state_json = None
@@ -646,34 +723,35 @@ with st.sidebar:
             room_code = st.session_state.host_room_code
             base_url = os.environ.get("TAROZON_BASE_URL", "https://tarozon.com").rstrip("/")
             invite_url = f"{base_url}/?room={room_code}"
-            st.success(f"방 코드: **{room_code}**")
-            st.caption("초대 링크 (클릭하여 복사)")
+            st.success(f"Room code: **{room_code}**")
+            st.caption("Invitation Link (click to copy)")
             st.code(invite_url, language=None)
         if is_admin:
-            if st.button("방 생성", use_container_width=True):
+            if st.button("Create Room", use_container_width=True):
                 rm = get_room_manager()
                 if not rm.is_available:
-                    st.error("Supabase 설정 필요 (SUPABASE_URL, SUPABASE_SERVICE_KEY)")
+                    st.error("Supabase configuration required (SUPABASE_URL, SUPABASE_SERVICE_KEY)")
                 else:
                     state_dict = _draw_state_to_dict(st.session_state.draw_state)
                     code = rm.create_room(state_dict)
                     if code:
                         st.session_state.host_room_code = code
+                        st.session_state.chat_nickname = "Tarozon"
                         st.rerun()
                     else:
-                        st.error("방 생성에 실패했어요.")
+                        st.error("Failed to create room.")
         else:
-            st.caption("입장 코드를 입력하세요")
-        join_code_raw = st.text_input("6자리 코드", key="room_code_input", placeholder="ABC123")
+            st.caption("Please enter your Lobby Access Key")
+        join_code_raw = st.text_input("Lobby Access Key", key="room_code_input", placeholder="ABC123")
         join_code = (join_code_raw.strip().upper() if join_code_raw else "") or None
-        if st.button("방 입장", use_container_width=True) and join_code:
+        if st.button("Check-in", use_container_width=True) and join_code:
             rm = get_room_manager()
             if not rm.is_available:
-                st.error("Supabase 설정 필요 (SUPABASE_URL, SUPABASE_SERVICE_KEY)")
+                st.error("Supabase configuration required (SUPABASE_URL, SUPABASE_SERVICE_KEY)")
             else:
                 room = rm.get_room(join_code)
                 if room is None:
-                    st.error("방을 찾을 수 없어요.")
+                    st.error("Room not found.")
                 else:
                     obj = room.get("state_json")
                     if isinstance(obj, dict):
@@ -691,15 +769,15 @@ with st.sidebar:
                             )
                             st.rerun()
                         else:
-                            st.error("방 데이터가 올바르지 않아요.")
+                            st.error("Invalid room data.")
                     else:
-                        st.error("방 데이터가 올바르지 않아요.")
+                        st.error("Invalid room data.")
 
 deck = decks[st.session_state.draw_state.deck_id]
 spread = spreads[st.session_state.draw_state.spread_id]
 
 if spread.layout is None:
-    st.error("이 스프레드는 아직 좌표 레이아웃이 없어서 보드 모드로 표시할 수 없어요.")
+    st.error("This spread has no coordinate layout and cannot be displayed in board mode.")
     st.stop()
 
 spread_path = REPO_ROOT / "data" / "spreads" / f"{spread.id}.json"
@@ -721,20 +799,21 @@ if st.session_state.get("viewer_mode") and current_room_code:
     _fragment_viewer_live(current_room_code)
     st.stop()
 
-st.subheader(f"🧿 {spread.name} 보드")
+st.subheader(f"{spread.name} · The Board")
 
 click = None
-if streamlit_image_coordinates is not None:
-    pil_img = Image.open(io.BytesIO(png_bytes))
-    click = streamlit_image_coordinates(
-        pil_img,
-        key=f"board_{spread.id}_{deck.id}",
-        use_column_width="always",
-        cursor="pointer",
-    )
-else:
-    st.image(png_bytes, use_container_width=True)
-    st.warning("클릭 드로우 기능을 위해 `streamlit-image-coordinates` 설치가 필요해요. `pip install -r requirements.txt`")
+with st.container(key="board_frame"):
+    if streamlit_image_coordinates is not None:
+        pil_img = Image.open(io.BytesIO(png_bytes))
+        click = streamlit_image_coordinates(
+            pil_img,
+            key=f"board_{spread.id}_{deck.id}",
+            use_column_width="always",
+            cursor="pointer",
+        )
+    else:
+        st.image(png_bytes, use_container_width=True)
+        st.warning("Install `streamlit-image-coordinates` for click-to-draw: `pip install -r requirements.txt`")
 
 board_key = f"{spread.id}:{deck.id}"
 click_time = None
@@ -785,9 +864,9 @@ if (
     st.session_state.last_click_unix_time[board_key] = float(click_time)
 
 download_bytes, download_meta = _download_png_bytes(png_bytes, spread.id, deck.id)
-st.caption(f"다운로드 최적화: {download_meta}")
+st.caption(f"Download optimized: {download_meta}")
 st.download_button(
-    "⬇️ 보드 이미지 다운로드(PNG)",
+    "Download Board (PNG)",
     data=download_bytes,
     file_name=f"{_timestamp_slug('tarozon-spread')}-{spread.id}-{deck.id}.png",
     mime="image/png",
@@ -800,11 +879,11 @@ if current_room_code:
     _fragment_host_chat(current_room_code)
 
 st.markdown("---")
-st.subheader("📝 GPT 리딩 요청문")
+st.subheader("Grand Interpretation")
 st.text_area(
-    "질문 입력",
+    "Your Question",
     key="question",
-    placeholder="예: 오늘의 조언을 알려줘. / 상대방의 마음이 궁금해.",
+    placeholder="e.g. What guidance does today hold? / I wish to know their heart.",
     height=120,
 )
 
@@ -835,16 +914,16 @@ if ready:
     )
 # st.info 제거: 등장/퇴장 시 레이아웃 점프 원인이었음. 안내는 text_area placeholder로 대체.
 
-st.markdown("**생성된 요청문**")
+st.markdown("**Grand Interpretation**")
 st.text_area(
-    "생성된 요청문",
+    "Grand Interpretation",
     value=prompt_text,
     height=240,
     label_visibility="collapsed",
-    placeholder="모든 슬롯에 카드를 채우면 여기에 요청문이 자동 생성돼요.",
+    placeholder="Fill all slots to generate your Grand Interpretation.",
 )
 # 복사 버튼: text_area 아래 한 줄 고정. HTML/JS로 클립보드 처리해 레이아웃 변동 없음.
-_copy_html = f"""<script>var __copyText={json.dumps(prompt_text)};</script><button onclick="navigator.clipboard.writeText(__copyText);this.textContent='복사됐어요';setTimeout(function(){{this.textContent='📋 복사';}}.bind(this),1200);" style="padding:0.4em 0.8em;cursor:pointer;">📋 복사</button>"""
+_copy_html = f"""<script>var __copyText={json.dumps(prompt_text)};</script><button onclick="navigator.clipboard.writeText(__copyText);this.textContent='Copied.';setTimeout(function(){{this.textContent='Copy';}}.bind(this),1200);" style="padding:0.4em 0.8em;cursor:pointer;border:2px solid #D4AF37;border-radius:0;background:#A2231D;color:white;">Copy</button>"""
 components.html(_copy_html, height=40)
 
 with st.container():
@@ -855,6 +934,6 @@ with st.container():
         st.link_button("Gemini", url="https://gemini.google.com", use_container_width=True)
     with col3:
         st.link_button("Grok", url="https://x.com/i/grok", use_container_width=True)
-    st.caption("요청문 복사 후 원하는 AI 채널에서 붙여넣기 하세요.")
+    st.caption("Copy the prompt and paste into your preferred AI channel.")
 
 # URL은 "사용자 액션(클릭/DRAW ALL/리셋/선택 변경)"에서만 업데이트합니다.
